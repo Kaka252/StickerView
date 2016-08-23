@@ -14,9 +14,9 @@ import android.widget.ImageView;
 /**
  * Created by zhouyou on 16/8/21.
  */
-public class ZoomImageView extends ImageView implements ViewTreeObserver.OnGlobalLayoutListener, View.OnTouchListener {
+public class GestureImageView extends ImageView implements ViewTreeObserver.OnGlobalLayoutListener, View.OnTouchListener {
 
-    private static final String TAG = ZoomImageView.class.getSimpleName();
+    private static final String TAG = GestureImageView.class.getSimpleName();
     // 最大缩放倍数
     private static final float MAX_SCALE = 4.0f;
     // 初始缩放倍数
@@ -30,15 +30,15 @@ public class ZoomImageView extends ImageView implements ViewTreeObserver.OnGloba
     // 缩放矩阵
     private Matrix matrix;
 
-    public ZoomImageView(Context context) {
+    public GestureImageView(Context context) {
         this(context, null);
     }
 
-    public ZoomImageView(Context context, AttributeSet attrs) {
+    public GestureImageView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ZoomImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public GestureImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
