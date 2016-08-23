@@ -22,7 +22,7 @@ import android.widget.ImageView;
  */
 public class TouchImageView extends ImageView {
 
-    private Matrix matrix;
+    private Matrix matrix = new Matrix();
     private Matrix savedMatrix = new Matrix();
     private Matrix moveMatrix = new Matrix();
     // 资源图片的位图
@@ -35,7 +35,7 @@ public class TouchImageView extends ImageView {
     private static final int TRANS = 1; // 拖拽模式
     private static final int ZOOM = 2; // 缩放模式
     // 是否超过边界
-    private boolean isOverBorder;
+    private boolean withinBorder;
 
     private int widthScreen;
     private int heightScreen;
@@ -58,7 +58,6 @@ public class TouchImageView extends ImageView {
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         widthScreen = dm.widthPixels;
         heightScreen = dm.heightPixels;
-        matrix = new Matrix();
     }
 
     @Override
@@ -118,7 +117,7 @@ public class TouchImageView extends ImageView {
                 oldDistance = getSpaceDistance(event);
                 oldRotation = getSpaceRotation(event);
                 savedMatrix.set(matrix);
-                getMiddlePoint(midPoint, event);
+                midPoint = getMidPoint(event);
                 break;
             case MotionEvent.ACTION_MOVE:
                 // 缩放
@@ -128,8 +127,8 @@ public class TouchImageView extends ImageView {
                     float scale = getSpaceDistance(event) / oldDistance;
                     moveMatrix.postScale(scale, scale, midPoint.x, midPoint.y);
                     moveMatrix.postRotate(deltaRotation, midPoint.x, midPoint.y);
-                    isOverBorder = getMatrixBorderCheck();
-                    if (!isOverBorder) {
+                    withinBorder = getMatrixBorderCheck(event.getX(), event.getY());
+                    if (withinBorder) {
                         matrix.set(moveMatrix);
                         invalidate();
                     }
@@ -138,8 +137,8 @@ public class TouchImageView extends ImageView {
                 else if (mode == TRANS) {
                     moveMatrix.set(savedMatrix);
                     moveMatrix.postTranslate(event.getX() - downX, event.getY() - downY);
-                    isOverBorder = getMatrixBorderCheck();
-                    if (!isOverBorder) {
+                    withinBorder = getMatrixBorderCheck(event.getX(), event.getY());
+                    if (withinBorder) {
                         matrix.set(moveMatrix);
                         invalidate();
                     }
@@ -190,50 +189,49 @@ public class TouchImageView extends ImageView {
     /**
      * 获取手势中心点
      *
-     * @param point
      * @param event
      */
-    private void getMiddlePoint(PointF point, MotionEvent event) {
-        int pointerCounts = event.getPointerCount();
-        float x = 0;
-        float y = 0;
-        for (int i = 0; i < pointerCounts; i++) {
-            x += event.getX(i);
-            y += event.getY(i);
-        }
-        x = x / pointerCounts;
-        y = x / pointerCounts;
-        point.set(x, y);
+    private PointF getMidPoint(MotionEvent event) {
+        PointF point = new PointF();
+        float x = event.getX(0) + event.getX(1);
+        float y = event.getY(0) + event.getY(1);
+        point.set(x / 2, y / 2);
+        return point;
     }
 
-    private boolean getMatrixBorderCheck() {
+    /**
+     * 将matrix的点映射成坐标点
+     *
+     * @return
+     */
+    protected float[] getBitmapPoints() {
+        float[] dst = new float[8];
+        float[] src = new float[]{
+                0, 0,
+                srcImage.getWidth(), 0,
+                0, srcImage.getHeight(),
+                srcImage.getWidth(), srcImage.getHeight()
+        };
+        moveMatrix.mapPoints(dst, src);
+        return dst;
+    }
+
+    private boolean getMatrixBorderCheck(float x, float y) {
         if (srcImage == null) return false;
-        float[] f = new float[9];
-        moveMatrix.getValues(f);
-        // 图片4个顶点的坐标
-        float x1 = f[0] * 0 + f[1] * 0 + f[2];
-        float y1 = f[3] * 0 + f[4] * 0 + f[5];
-        float x2 = f[0] * srcImage.getWidth() + f[1] * 0 + f[2];
-        float y2 = f[3] * srcImage.getWidth() + f[4] * 0 + f[5];
-        float x3 = f[0] * 0 + f[1] * srcImage.getHeight() + f[2];
-        float y3 = f[3] * 0 + f[4] * srcImage.getHeight() + f[5];
-        float x4 = f[0] * srcImage.getWidth() + f[1] * srcImage.getHeight() + f[2];
-        float y4 = f[3] * srcImage.getWidth() + f[4] * srcImage.getHeight() + f[5];
-        // 图片现宽度
-        double width = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-        // 缩放比率判断
-        if (width < widthScreen / 3 || width > widthScreen * 3) {
-            return true;
-        }
-        // 出界判断
-        if ((x1 < widthScreen / 3 && x2 < widthScreen / 3
-                && x3 < widthScreen / 3 && x4 < widthScreen / 3)
-                || (x1 > widthScreen * 2 / 3 && x2 > widthScreen * 2 / 3
-                && x3 > widthScreen * 2 / 3 && x4 > widthScreen * 2 / 3)
-                || (y1 < heightScreen / 3 && y2 < heightScreen / 3
-                && y3 < heightScreen / 3 && y4 < heightScreen / 3)
-                || (y1 > heightScreen * 2 / 3 && y2 > heightScreen * 2 / 3
-                && y3 > heightScreen * 2 / 3 && y4 > heightScreen * 2 / 3)) {
+        float[] points = getBitmapPoints();
+        float x1 = points[0];
+        float y1 = points[1];
+        float x2 = points[2];
+        float y2 = points[3];
+        float x3 = points[4];
+        float y3 = points[5];
+        float x4 = points[6];
+        float y4 = points[7];
+        float edge = (float) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+        if ((2 + Math.sqrt(2)) * edge >= Math.sqrt(Math.pow(x - x1, 2) + Math.pow(y - y1, 2))
+                + Math.sqrt(Math.pow(x - x2, 2) + Math.pow(y - y2, 2))
+                + Math.sqrt(Math.pow(x - x3, 2) + Math.pow(y - y3, 2))
+                + Math.sqrt(Math.pow(x - x4, 2) + Math.pow(y - y4, 2))) {
             return true;
         }
         return false;
