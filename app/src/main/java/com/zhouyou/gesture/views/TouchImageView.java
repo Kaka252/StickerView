@@ -37,9 +37,6 @@ public class TouchImageView extends ImageView {
     // 是否超过边界
     private boolean withinBorder;
 
-    private int widthScreen;
-    private int heightScreen;
-
     public TouchImageView(Context context) {
         this(context, null);
     }
@@ -55,9 +52,6 @@ public class TouchImageView extends ImageView {
 
     private void init(Context context) {
         setScaleType(ScaleType.MATRIX);
-        DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        widthScreen = dm.widthPixels;
-        heightScreen = dm.heightPixels;
     }
 
     @Override
@@ -216,6 +210,12 @@ public class TouchImageView extends ImageView {
         return dst;
     }
 
+    /**
+     * 检查边界
+     * @param x
+     * @param y
+     * @return true - 在边界内 ｜ false － 超出边界
+     */
     private boolean getMatrixBorderCheck(float x, float y) {
         if (srcImage == null) return false;
         float[] points = getBitmapPoints();
