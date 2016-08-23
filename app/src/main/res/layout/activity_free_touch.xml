@@ -4,9 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
+    <com.zhouyou.gesture.views.TouchImageView
         android:id="@+id/iv_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:src="@mipmap/ic_avatar_2" />
 
 </RelativeLayout>
