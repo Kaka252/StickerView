@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,18 +14,24 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
-import android.widget.ImageView;
+import android.view.View;
+
+import com.zhouyou.gesture.R;
 
 /**
  * 作者：ZhouYou
  * 日期：2016/8/23.
  */
-public class TouchImageView extends ImageView {
+public class TouchImageView extends View {
 
+    // 绘制图片的边框
+    private Paint paintEdge;
+    // 绘制图片的矩阵
     private Matrix matrix = new Matrix();
-    private Matrix savedMatrix = new Matrix();
+    // 手指按下时图片的矩阵
+    private Matrix downMatrix = new Matrix();
+    // 手指移动时图片的矩阵
     private Matrix moveMatrix = new Matrix();
     // 资源图片的位图
     private Bitmap srcImage;
@@ -47,43 +55,40 @@ public class TouchImageView extends ImageView {
 
     public TouchImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
-        setScaleType(ScaleType.MATRIX);
+    private void init() {
+        paintEdge = new Paint();
+        paintEdge.setColor(Color.BLACK);
+        paintEdge.setAlpha(170);
+        paintEdge.setAntiAlias(true);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        srcImage = transDrawable2Bitmap(getDrawable());
-    }
-
-    private Bitmap transDrawable2Bitmap(Drawable drawable) {
-        if (drawable == null) return null;
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) drawable).getBitmap();
-        } else if (drawable instanceof NinePatchDrawable) {
-            Bitmap bitmap = Bitmap
-                    .createBitmap(
-                            drawable.getIntrinsicWidth(),
-                            drawable.getIntrinsicHeight(),
-                            drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
-                                    : Bitmap.Config.RGB_565);
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
-                    drawable.getIntrinsicHeight());
-            drawable.draw(canvas);
-            return bitmap;
-        } else {
-            return null;
-        }
-
+        srcImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        float[] points = getBitmapPoints(srcImage, matrix);
+        float x1 = points[0];
+        float y1 = points[1];
+        float x2 = points[2];
+        float y2 = points[3];
+        float x3 = points[4];
+        float y3 = points[5];
+        float x4 = points[6];
+        float y4 = points[7];
+        // 画边框
+        canvas.drawLine(x1, y1, x2, y2, paintEdge);
+        canvas.drawLine(x2, y2, x4, y4, paintEdge);
+        canvas.drawLine(x4, y4, x3, y3, paintEdge);
+        canvas.drawLine(x3, y3, x1, y1, paintEdge);
+        // 画图片
         canvas.drawBitmap(srcImage, matrix, null);
     }
 
@@ -104,24 +109,24 @@ public class TouchImageView extends ImageView {
                 mode = TRANS;
                 downX = event.getX();
                 downY = event.getY();
-                savedMatrix.set(matrix);
+                downMatrix.set(matrix);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN: // 多点触控
                 mode = ZOOM;
                 oldDistance = getSpaceDistance(event);
                 oldRotation = getSpaceRotation(event);
-                savedMatrix.set(matrix);
+                downMatrix.set(matrix);
                 midPoint = getMidPoint(event);
                 break;
             case MotionEvent.ACTION_MOVE:
                 // 缩放
                 if (mode == ZOOM) {
-                    moveMatrix.set(savedMatrix);
+                    moveMatrix.set(downMatrix);
                     float deltaRotation = getSpaceRotation(event) - oldRotation;
                     float scale = getSpaceDistance(event) / oldDistance;
                     moveMatrix.postScale(scale, scale, midPoint.x, midPoint.y);
                     moveMatrix.postRotate(deltaRotation, midPoint.x, midPoint.y);
-                    withinBorder = getMatrixBorderCheck(event.getX(), event.getY());
+                    withinBorder = getMatrixBorderCheck(srcImage, event.getX(), event.getY());
                     if (withinBorder) {
                         matrix.set(moveMatrix);
                         invalidate();
@@ -129,9 +134,9 @@ public class TouchImageView extends ImageView {
                 }
                 // 平移
                 else if (mode == TRANS) {
-                    moveMatrix.set(savedMatrix);
+                    moveMatrix.set(downMatrix);
                     moveMatrix.postTranslate(event.getX() - downX, event.getY() - downY);
-                    withinBorder = getMatrixBorderCheck(event.getX(), event.getY());
+                    withinBorder = getMatrixBorderCheck(srcImage, event.getX(), event.getY());
                     if (withinBorder) {
                         matrix.set(moveMatrix);
                         invalidate();
@@ -155,16 +160,10 @@ public class TouchImageView extends ImageView {
      * @return
      */
     private float getSpaceRotation(MotionEvent event) {
-        int pointerCounts = event.getPointerCount();
-        float x = 0;
-        float y = 0;
-        for (int i = 0; i < pointerCounts; i++) {
-            x += event.getX(i);
-            y += event.getY(i);
-        }
-        x = x / pointerCounts;
-        y = x / pointerCounts;
-        return (float) Math.sqrt(x * x + y * y);
+        double deltaX = event.getX(0) - event.getX(1);
+        double deltaY = event.getY(0) - event.getY(1);
+        double radians = Math.atan2(deltaY, deltaX);
+        return (float) Math.toDegrees(radians);
     }
 
     /**
@@ -174,10 +173,9 @@ public class TouchImageView extends ImageView {
      * @return
      */
     private float getSpaceDistance(MotionEvent event) {
-        double deltaX = event.getX(0) - event.getX(1);
-        double deltaY = event.getY(0) - event.getY(1);
-        double radians = Math.atan2(deltaY, deltaX);
-        return (float) Math.toDegrees(radians);
+        float x = event.getX(0) + event.getX(1);
+        float y = event.getY(0) + event.getY(1);
+        return (float) Math.sqrt(x * x + y * y);
     }
 
     /**
@@ -198,27 +196,28 @@ public class TouchImageView extends ImageView {
      *
      * @return
      */
-    protected float[] getBitmapPoints() {
+    protected float[] getBitmapPoints(Bitmap bitmap, Matrix matrix) {
         float[] dst = new float[8];
         float[] src = new float[]{
                 0, 0,
-                srcImage.getWidth(), 0,
-                0, srcImage.getHeight(),
-                srcImage.getWidth(), srcImage.getHeight()
+                bitmap.getWidth(), 0,
+                0, bitmap.getHeight(),
+                bitmap.getWidth(), bitmap.getHeight()
         };
-        moveMatrix.mapPoints(dst, src);
+        matrix.mapPoints(dst, src);
         return dst;
     }
 
     /**
      * 检查边界
+     *
      * @param x
      * @param y
      * @return true - 在边界内 ｜ false － 超出边界
      */
-    private boolean getMatrixBorderCheck(float x, float y) {
-        if (srcImage == null) return false;
-        float[] points = getBitmapPoints();
+    private boolean getMatrixBorderCheck(Bitmap bitmap, float x, float y) {
+        if (bitmap == null) return false;
+        float[] points = getBitmapPoints(bitmap, moveMatrix);
         float x1 = points[0];
         float y1 = points[1];
         float x2 = points[2];
@@ -236,6 +235,4 @@ public class TouchImageView extends ImageView {
         }
         return false;
     }
-
-
 }
