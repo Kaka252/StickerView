@@ -17,10 +17,15 @@ import com.zhouyou.gesture.R;
 
 /**
  * 作者：ZhouYou
- * 日期：2016/8/23.
+ * 日期：2016/8/25.
  */
-public class TouchImageView extends View {
-
+public class StickerView extends View {
+    // 绘制旋转图片按钮
+    private Paint paintRotate;
+    // 绘制缩放图片按钮
+    private Paint paintResize;
+    // 绘制图片的边框
+    private Paint paintEdge;
     // 绘制图片的矩阵
     private Matrix matrix = new Matrix();
     // 手指按下时图片的矩阵
@@ -29,6 +34,10 @@ public class TouchImageView extends View {
     private Matrix moveMatrix = new Matrix();
     // 资源图片的位图
     private Bitmap srcImage;
+    // 资源缩放图片的位图
+    private Bitmap srcImageResize;
+    // 资源旋转图片的位图
+    private Bitmap srcImageRotate;
     // 多点触屏时的中心点
     private PointF midPoint = new PointF();
     // 触控模式
@@ -39,29 +48,63 @@ public class TouchImageView extends View {
     // 是否超过边界
     private boolean withinBorder;
 
-    public TouchImageView(Context context) {
+    public StickerView(Context context) {
         this(context, null);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs) {
+    public StickerView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public StickerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        paintEdge = new Paint();
+        paintEdge.setColor(Color.BLACK);
+        paintEdge.setAlpha(170);
+        paintEdge.setAntiAlias(true);
+        paintResize = new Paint();
+        paintResize.setAntiAlias(true);
+        paintResize.setFilterBitmap(true);
+        paintRotate = new Paint();
+        paintRotate.setAntiAlias(true);
+        paintRotate.setFilterBitmap(true);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         srcImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1);
+        srcImageResize = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_resize);
+        srcImageRotate = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_rotate);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        float[] points = getBitmapPoints(srcImage, matrix);
+        float x1 = points[0];
+        float y1 = points[1];
+        float x2 = points[2];
+        float y2 = points[3];
+        float x3 = points[4];
+        float y3 = points[5];
+        float x4 = points[6];
+        float y4 = points[7];
+        // 画边框
+        canvas.drawLine(x1, y1, x2, y2, paintEdge);
+        canvas.drawLine(x2, y2, x4, y4, paintEdge);
+        canvas.drawLine(x4, y4, x3, y3, paintEdge);
+        canvas.drawLine(x3, y3, x1, y1, paintEdge);
         // 画图片
         canvas.drawBitmap(srcImage, matrix, null);
+        // 画顶点缩放图片
+        canvas.drawBitmap(srcImageResize, x3 - srcImageResize.getWidth() / 2, y3 - srcImageResize.getHeight() / 2, paintResize);
+        // 画顶点旋转图片
+        canvas.drawBitmap(srcImageRotate, x2 - srcImageRotate.getWidth() / 2, y2 - srcImageRotate.getHeight() / 2, paintRotate);
     }
 
     // 手指按下屏幕的X坐标
@@ -86,19 +129,15 @@ public class TouchImageView extends View {
             case MotionEvent.ACTION_POINTER_DOWN: // 多点触控
                 mode = ZOOM;
                 oldDistance = getSpaceDistance(event);
-                oldRotation = getSpaceRotation(event);
                 midPoint = getMidPoint(event);
                 downMatrix.set(matrix);
                 break;
             case MotionEvent.ACTION_MOVE:
-                // 缩放
                 if (mode == ZOOM) {
                     moveMatrix.set(downMatrix);
-                    float deltaRotation = getSpaceRotation(event) - oldRotation;
                     float scale = getSpaceDistance(event) / oldDistance;
                     moveMatrix.postScale(scale, scale, midPoint.x, midPoint.y);
-                    moveMatrix.postRotate(deltaRotation, midPoint.x, midPoint.y);
-                    withinBorder = getMatrixBorderCheck(srcImage, event.getX(), event.getY());
+                    withinBorder = getPointerBorderCheck(srcImage, event.getX(), event.getY());
                     if (withinBorder) {
                         matrix.set(moveMatrix);
                         invalidate();
@@ -108,7 +147,7 @@ public class TouchImageView extends View {
                 else if (mode == TRANS) {
                     moveMatrix.set(downMatrix);
                     moveMatrix.postTranslate(event.getX() - downX, event.getY() - downY);
-                    withinBorder = getMatrixBorderCheck(srcImage, event.getX(), event.getY());
+                    withinBorder = getPointerBorderCheck(srcImage, event.getX(), event.getY());
                     if (withinBorder) {
                         matrix.set(moveMatrix);
                         invalidate();
@@ -187,7 +226,7 @@ public class TouchImageView extends View {
      * @param y
      * @return true - 在边界内 ｜ false － 超出边界
      */
-    private boolean getMatrixBorderCheck(Bitmap bitmap, float x, float y) {
+    private boolean getPointerBorderCheck(Bitmap bitmap, float x, float y) {
         if (bitmap == null) return false;
         float[] points = getBitmapPoints(bitmap, moveMatrix);
         float x1 = points[0];
@@ -206,12 +245,5 @@ public class TouchImageView extends View {
             return true;
         }
         return false;
-    }
-
-    /**
-     * 添加水印
-     */
-    public void addWatermark() {
-
     }
 }

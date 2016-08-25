@@ -20,4 +20,11 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dip"
         android:text="缩放、旋转、平移" />
+
+    <Button
+        android:id="@+id/btn_sticker_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dip"
+        android:text="实现贴纸效果" />
 </LinearLayout>
