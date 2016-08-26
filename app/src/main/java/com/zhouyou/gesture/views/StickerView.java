@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,10 +22,6 @@ import com.zhouyou.gesture.R;
  * 日期：2016/8/25.
  */
 public class StickerView extends View {
-    // 绘制旋转图片按钮
-    private Paint paintRotate;
-    // 绘制缩放图片按钮
-    private Paint paintResize;
     // 绘制图片的边框
     private Paint paintEdge;
     // 绘制图片的矩阵
@@ -37,8 +34,10 @@ public class StickerView extends View {
     private Bitmap srcImage;
     // 资源缩放图片的位图
     private Bitmap srcImageResize;
+    private Rect rectResize;
     // 资源旋转图片的位图
     private Bitmap srcImageRotate;
+    private Rect rectRotate;
     // 多点触屏时的中心点
     private PointF midPoint = new PointF();
     // 图片的中心点坐标
@@ -69,18 +68,15 @@ public class StickerView extends View {
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
         paintEdge.setAntiAlias(true);
-        paintResize = new Paint();
-        paintResize.setAntiAlias(true);
-        paintResize.setFilterBitmap(true);
-        paintRotate = new Paint();
-        paintRotate.setAntiAlias(true);
-        paintRotate.setFilterBitmap(true);
         // 初始化绘图矩阵
         matrix = new Matrix();
         // 获取图片资源的bitmap
         srcImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1);
         srcImageResize = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_resize);
         srcImageRotate = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_rotate);
+        // 初始化操作按钮的矩形框
+        rectResize = new Rect();
+        rectRotate = new Rect();
     }
 
     @Override
@@ -103,15 +99,17 @@ public class StickerView extends View {
         // 画图片
         canvas.drawBitmap(srcImage, matrix, null);
         // 画顶点缩放图片
-        canvas.drawBitmap(srcImageResize,
-                x3 - srcImageResize.getWidth() / 2,
-                y3 - srcImageResize.getHeight() / 2,
-                paintResize);
+        rectResize.left = (int) (x3 - srcImageResize.getWidth() / 2);
+        rectResize.right = (int) (x3 + srcImageResize.getWidth() / 2);
+        rectResize.top = (int) (y3 - srcImageResize.getHeight() / 2);
+        rectResize.bottom = (int) (y3 + srcImageResize.getHeight() / 2);
+        canvas.drawBitmap(srcImageResize, null, rectResize, null);
         // 画顶点旋转图片
-        canvas.drawBitmap(srcImageRotate,
-                x2 - srcImageRotate.getWidth() / 2,
-                y2 - srcImageRotate.getHeight() / 2,
-                paintRotate);
+        rectRotate.left = (int) (x2 - srcImageRotate.getWidth() / 2);
+        rectRotate.right = (int) (x2 + srcImageRotate.getWidth() / 2);
+        rectRotate.top = (int) (y2 - srcImageRotate.getHeight() / 2);
+        rectRotate.bottom = (int) (y2 + srcImageRotate.getHeight() / 2);
+        canvas.drawBitmap(srcImageRotate, null, rectRotate, null);
     }
 
     // 手指按下屏幕的X坐标
@@ -131,7 +129,7 @@ public class StickerView extends View {
                 downX = event.getX();
                 downY = event.getY();
                 // 旋转手势验证
-                if (isRotateActionCheck(downX, downY)) {
+                if (isInActionCheck(event, rectRotate)) {
                     mode = ROTATE;
                     imageMidPoint = getImageMidPoint();
                     oldRotation = getSpaceRotation(event);
@@ -139,7 +137,7 @@ public class StickerView extends View {
                     Log.d("onTouchEvent", "旋转手势");
                 }
                 // 单点缩放手势验证
-                else if (isSingleZoomActionCheck(downX, downY)) {
+                else if (isInActionCheck(event, rectResize)) {
                     mode = ZOOM_SINGLE;
                     imageMidPoint = getImageMidPoint();
                     oldDistance = getSingleTouchDistance(event);
@@ -312,40 +310,17 @@ public class StickerView extends View {
     }
 
     /**
-     * 判断手指是否按在旋转图片的范围内
+     * 判断手指触摸的区域是否在顶点的操作按钮内
      *
-     * @param x 按下的x坐标
-     * @param y 按下的y坐标
+     * @param event
+     * @param rect
      * @return
      */
-    private boolean isRotateActionCheck(float x, float y) {
-        if (srcImageRotate == null) return false;
-        float[] points = getBitmapPoints(srcImage, downMatrix);
-        float x2 = points[2];
-        float y2 = points[3];
-        int distance = (int) Math.sqrt(Math.pow(x - x2, 2) + Math.pow(y - y2, 2));
-        if (distance <= srcImageRotate.getWidth() / 2) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 判断手指是否按在图片的范围内
-     *
-     * @param x 按下的x坐标
-     * @param y 按下的y坐标
-     * @return
-     */
-    private boolean isSingleZoomActionCheck(float x, float y) {
-        if (srcImageResize == null) return false;
-        float[] points = getBitmapPoints(srcImage, downMatrix);
-        float x3 = points[4];
-        float y3 = points[5];
-        int distance = (int) Math.sqrt(Math.pow(x - x3, 2) + Math.pow(y - y3, 2));
-        if (distance <= srcImageResize.getWidth() / 2) {
-            return true;
-        }
-        return false;
+    private boolean isInActionCheck(MotionEvent event, Rect rect) {
+        int left = rect.left;
+        int right = rect.right;
+        int top = rect.top;
+        int bottom = rect.bottom;
+        return event.getX(0) >= left && event.getX(0) <= right && event.getY(0) >= top && event.getY(0) <= bottom;
     }
 }
