@@ -259,12 +259,8 @@ public class StickerView extends View {
         PointF point = new PointF();
         float[] points = getBitmapPoints(srcImage, moveMatrix);
         float x1 = points[0];
-        float y1 = points[1];
         float x2 = points[2];
         float y2 = points[3];
-        float x3 = points[4];
-        float y3 = points[5];
-        float x4 = points[6];
         float y4 = points[7];
         point.set((x1 + x2) / 2, (y2 + y4) / 2);
         return point;
