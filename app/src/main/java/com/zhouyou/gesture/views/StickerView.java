@@ -25,7 +25,7 @@ public class StickerView extends View {
     // 绘制图片的边框
     private Paint paintEdge;
     // 绘制图片的矩阵
-    private Matrix matrix;
+    private Matrix matrix = new Matrix();
     // 手指按下时图片的矩阵
     private Matrix downMatrix = new Matrix();
     // 手指移动时图片的矩阵
@@ -68,8 +68,6 @@ public class StickerView extends View {
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
         paintEdge.setAntiAlias(true);
-        // 初始化绘图矩阵
-        matrix = new Matrix();
         // 获取图片资源的bitmap
         srcImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1);
         srcImageResize = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_resize);
@@ -77,6 +75,14 @@ public class StickerView extends View {
         // 初始化操作按钮的矩形框
         rectResize = new Rect();
         rectRotate = new Rect();
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (changed) {
+            matrix.postTranslate((right - srcImage.getWidth()) / 2, (bottom - srcImage.getHeight()) / 2);
+        }
     }
 
     @Override

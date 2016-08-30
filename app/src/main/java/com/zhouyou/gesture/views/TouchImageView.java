@@ -47,12 +47,19 @@ public class TouchImageView extends View {
 
     public TouchImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        srcImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1);
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        srcImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1);
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (changed) {
+            matrix.postTranslate((right - srcImage.getWidth()) / 2, (bottom - srcImage.getHeight()) / 2);
+        }
     }
 
     @Override
