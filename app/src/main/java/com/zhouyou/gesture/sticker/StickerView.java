@@ -20,6 +20,10 @@ import com.zhouyou.gesture.R;
 public class StickerView extends View {
 
     private Sticker sticker;
+    // 手指按下时图片的矩阵
+    private Matrix downMatrix = new Matrix();
+    // 手指移动时图片的矩阵
+    private Matrix moveMatrix = new Matrix();
     // 多点触屏时的中心点
     private PointF midPoint = new PointF();
     // 图片的中心点坐标
@@ -75,23 +79,23 @@ public class StickerView extends View {
                 // 旋转手势验证
                 if (sticker.isInActionCheck(event, sticker.getRotateIcon())) {
                     mode = ROTATE;
-                    imageMidPoint = sticker.getImageMidPoint();
+                    downMatrix.set(sticker.getMatrix());
+                    imageMidPoint = sticker.getImageMidPoint(downMatrix);
                     oldRotation = sticker.getSpaceRotation(event, imageMidPoint);
-                    sticker.copyMatrix2DownMatrix();
                     Log.d("onTouchEvent", "旋转手势");
                 }
                 // 单点缩放手势验证
                 else if (sticker.isInActionCheck(event, sticker.getZoomIcon())) {
                     mode = ZOOM_SINGLE;
-                    imageMidPoint = sticker.getImageMidPoint();
+                    downMatrix.set(sticker.getMatrix());
+                    imageMidPoint = sticker.getImageMidPoint(downMatrix);
                     oldDistance = sticker.getSingleTouchDistance(event, imageMidPoint);
-                    sticker.copyMatrix2DownMatrix();
                     Log.d("onTouchEvent", "单点缩放手势");
                 }
                 // 平移手势验证
-                else if (sticker.isWithinImageCheck(event)) {
+                else if (sticker.isWithinImageCheck(event, downMatrix)) {
                     mode = TRANS;
-                    sticker.copyMatrix2DownMatrix();
+                    downMatrix.set(sticker.getMatrix());
                     Log.d("onTouchEvent", "平移手势");
                 }
                 break;
@@ -99,44 +103,46 @@ public class StickerView extends View {
                 mode = ZOOM_MULTI;
                 oldDistance = sticker.getMultiTouchDistance(event);
                 midPoint = sticker.getMidPoint(event);
-                sticker.copyMatrix2DownMatrix();
+                downMatrix.set(sticker.getMatrix());
                 break;
             case MotionEvent.ACTION_MOVE:
                 // 单点旋转
                 if (mode == ROTATE) {
-                    sticker.copyDownMatrix2MoveMatrix();
+                    moveMatrix.set(downMatrix);
                     float deltaRotation = sticker.getSpaceRotation(event, imageMidPoint) - oldRotation;
-                    sticker.getMoveMatrix().postRotate(deltaRotation, imageMidPoint.x, imageMidPoint.y);
-                    sticker.copyMoveMatrix2Matrix();
+                    moveMatrix.postRotate(deltaRotation, imageMidPoint.x, imageMidPoint.y);
+                    sticker.getMatrix().set(moveMatrix);
                     invalidate();
                 }
                 // 单点缩放
                 else if (mode == ZOOM_SINGLE) {
-                    sticker.copyDownMatrix2MoveMatrix();
+                    moveMatrix.set(downMatrix);
                     float scale = sticker.getSingleTouchDistance(event, imageMidPoint) / oldDistance;
-                    sticker.getMoveMatrix().postScale(scale, scale, imageMidPoint.x, imageMidPoint.y);
-                    sticker.copyMoveMatrix2Matrix();
+                    moveMatrix.postScale(scale, scale, imageMidPoint.x, imageMidPoint.y);
+                    sticker.getMatrix().set(moveMatrix);
                     invalidate();
                 }
                 // 多点缩放
                 else if (mode == ZOOM_MULTI) {
-                    sticker.copyDownMatrix2MoveMatrix();
+                    moveMatrix.set(downMatrix);
                     float scale = sticker.getMultiTouchDistance(event) / oldDistance;
-                    sticker.getMoveMatrix().postScale(scale, scale, midPoint.x, midPoint.y);
-                    sticker.copyMoveMatrix2Matrix();
+                    moveMatrix.postScale(scale, scale, midPoint.x, midPoint.y);
+                    sticker.getMatrix().set(moveMatrix);
                     invalidate();
                 }
                 // 平移
                 else if (mode == TRANS) {
-                    sticker.copyDownMatrix2MoveMatrix();
-                    sticker.getMoveMatrix().postTranslate(event.getX() - downX, event.getY() - downY);
-                    sticker.copyMoveMatrix2Matrix();
+                    moveMatrix.set(downMatrix);
+                    moveMatrix.postTranslate(event.getX() - downX, event.getY() - downY);
+                    sticker.getMatrix().set(moveMatrix);
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
                 mode = NONE;
+                midPoint = null;
+                imageMidPoint = null;
                 break;
             default:
                 break;

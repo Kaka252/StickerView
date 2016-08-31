@@ -22,16 +22,14 @@ public class Sticker {
     private Paint paintEdge;
     // 绘制图片的矩阵
     private Matrix matrix;
-    // 手指按下时图片的矩阵
-    private Matrix downMatrix;
-    // 手指移动时图片的矩阵
-    private Matrix moveMatrix;
     // 原图片
     private Bitmap srcImage;
     // 旋转操作图片
     private StickerActionIcon rotateIcon;
     // 缩放操作图片
     private StickerActionIcon zoomIcon;
+    // 图片的中心点坐标
+    private PointF imageMidPoint = new PointF();
 
     public Sticker(Context context, Bitmap bitmap) {
         this.context = context;
@@ -41,9 +39,6 @@ public class Sticker {
 
     private void init() {
         matrix = new Matrix();
-        downMatrix = new Matrix();
-        moveMatrix = new Matrix();
-
         paintEdge = new Paint();
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
@@ -82,7 +77,7 @@ public class Sticker {
      *
      * @return true - 在边界内 ｜ false － 超出边界
      */
-    public boolean isWithinImageCheck(MotionEvent event) {
+    public boolean isWithinImageCheck(MotionEvent event, Matrix moveMatrix) {
         if (srcImage == null) return false;
         float x = event.getX();
         float y = event.getY();
@@ -135,9 +130,9 @@ public class Sticker {
     /**
      * 获取图片中心点
      */
-    public PointF getImageMidPoint() {
+    public PointF getImageMidPoint(Matrix matrix) {
         PointF point = new PointF();
-        float[] points = getBitmapPoints(srcImage, moveMatrix);
+        float[] points = getBitmapPoints(srcImage, matrix);
         float x1 = points[0];
         float x2 = points[2];
         float y2 = points[3];
@@ -201,22 +196,9 @@ public class Sticker {
         return event.getX(0) >= left && event.getX(0) <= right && event.getY(0) >= top && event.getY(0) <= bottom;
     }
 
-    public void copyMoveMatrix2Matrix() {
-        matrix.set(moveMatrix);
+    public Matrix getMatrix() {
+        return matrix;
     }
-
-    public void copyMatrix2DownMatrix() {
-        downMatrix.set(matrix);
-    }
-
-    public void copyDownMatrix2MoveMatrix() {
-        moveMatrix.set(downMatrix);
-    }
-
-    public Matrix getMoveMatrix() {
-        return moveMatrix;
-    }
-
 
     public StickerActionIcon getRotateIcon() {
         return rotateIcon;
