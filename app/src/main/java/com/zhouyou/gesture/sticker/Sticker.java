@@ -28,8 +28,6 @@ public class Sticker {
     private StickerActionIcon rotateIcon;
     // 缩放操作图片
     private StickerActionIcon zoomIcon;
-    // 图片的中心点坐标
-    private PointF imageMidPoint = new PointF();
 
     public Sticker(Context context, Bitmap bitmap) {
         this.context = context;
