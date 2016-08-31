@@ -5,7 +5,7 @@
     android:background="@android:color/holo_blue_bright"
     android:orientation="vertical">
 
-    <com.zhouyou.gesture.views.StickerView
+    <com.zhouyou.gesture.sticker.StickerView
         android:id="@+id/sticker_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
