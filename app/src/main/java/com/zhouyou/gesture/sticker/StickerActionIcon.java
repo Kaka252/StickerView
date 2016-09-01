@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.view.MotionEvent;
 
 /**
  * 作者：ZhouYou
@@ -35,8 +36,18 @@ public class StickerActionIcon {
         canvas.drawBitmap(srcIcon, null, rect, null);
     }
 
-    public Rect getRect() {
-        return rect;
+    /**
+     * 判断手指触摸的区域是否在顶点的操作按钮内
+     *
+     * @param event
+     * @return
+     */
+    public boolean isInActionCheck(MotionEvent event) {
+        int left = rect.left;
+        int right = rect.right;
+        int top = rect.top;
+        int bottom = rect.bottom;
+        return event.getX(0) >= left && event.getX(0) <= right && event.getY(0) >= top && event.getY(0) <= bottom;
     }
 
 }

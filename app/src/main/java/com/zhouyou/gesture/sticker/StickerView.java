@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.MotionEventCompat;
@@ -13,6 +14,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.zhouyou.gesture.R;
 
 /**
  * 作者：ZhouYou
@@ -31,6 +34,10 @@ public class StickerView extends View {
     private PointF midPoint = new PointF();
     // 图片的中心点坐标
     private PointF imageMidPoint = new PointF();
+    // 旋转操作图片
+    private StickerActionIcon rotateIcon;
+    // 缩放操作图片
+    private StickerActionIcon zoomIcon;
 
     // 触控模式
     private int mode;
@@ -50,15 +57,35 @@ public class StickerView extends View {
 
     public StickerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context);
+    }
+
+    private void init(Context context) {
         this.context = context;
+        rotateIcon = new StickerActionIcon(context);
+        rotateIcon.setSrcIcon(R.mipmap.ic_rotate);
+        zoomIcon = new StickerActionIcon(context);
+        zoomIcon.setSrcIcon(R.mipmap.ic_resize);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (sticker != null) {
-            sticker.draw(canvas);
-        }
+        if (sticker == null) return;
+        sticker.draw(canvas);
+        float[] points = StickerUtils.getBitmapPoints(sticker.getSrcImage(), sticker.getMatrix());
+        float x1 = points[0];
+        float y1 = points[1];
+        float x2 = points[2];
+        float y2 = points[3];
+        float x3 = points[4];
+        float y3 = points[5];
+        float x4 = points[6];
+        float y4 = points[7];
+        // 画操作按钮图片
+        rotateIcon.draw(canvas, x2, y2);
+        zoomIcon.draw(canvas, x3, y3);
+
     }
 
     // 手指按下屏幕的X坐标
@@ -78,7 +105,7 @@ public class StickerView extends View {
                 downX = event.getX();
                 downY = event.getY();
                 // 旋转手势验证
-                if (sticker.isInActionCheck(event, sticker.getRotateIcon())) {
+                if (rotateIcon.isInActionCheck(event)) {
                     mode = ROTATE;
                     downMatrix.set(sticker.getMatrix());
                     imageMidPoint = sticker.getImageMidPoint(downMatrix);
@@ -86,7 +113,7 @@ public class StickerView extends View {
                     Log.d("onTouchEvent", "旋转手势");
                 }
                 // 单点缩放手势验证
-                else if (sticker.isInActionCheck(event, sticker.getZoomIcon())) {
+                else if (zoomIcon.isInActionCheck(event)) {
                     mode = ZOOM_SINGLE;
                     downMatrix.set(sticker.getMatrix());
                     imageMidPoint = sticker.getImageMidPoint(downMatrix);
@@ -94,7 +121,7 @@ public class StickerView extends View {
                     Log.d("onTouchEvent", "单点缩放手势");
                 }
                 // 平移手势验证
-                else if (sticker.isWithinImageCheck(event, moveMatrix)) {
+                else if (isInStickerArea(sticker, event)) {
                     mode = TRANS;
                     downMatrix.set(sticker.getMatrix());
                     Log.d("onTouchEvent", "平移手势");
@@ -150,6 +177,12 @@ public class StickerView extends View {
         }
         return true;
     }
+
+    private boolean isInStickerArea(Sticker sticker, MotionEvent event) {
+        RectF dst = sticker.getSrcImageBound();
+        return dst.contains(event.getX(), event.getY());
+    }
+
 
     /**
      * 添加一个贴纸
