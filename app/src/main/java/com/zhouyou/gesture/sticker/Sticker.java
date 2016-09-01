@@ -194,6 +194,14 @@ public class Sticker {
         return event.getX(0) >= left && event.getX(0) <= right && event.getY(0) >= top && event.getY(0) <= bottom;
     }
 
+    public int getStickerWidth() {
+        return srcImage == null ? 0 : srcImage.getWidth();
+    }
+
+    public int getStickerHeight() {
+        return srcImage == null ? 0 : srcImage.getHeight();
+    }
+
     public Matrix getMatrix() {
         return matrix;
     }

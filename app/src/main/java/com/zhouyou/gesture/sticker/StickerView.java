@@ -1,17 +1,18 @@
 package com.zhouyou.gesture.sticker;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.zhouyou.gesture.R;
 
 /**
  * 作者：ZhouYou
@@ -19,6 +20,8 @@ import com.zhouyou.gesture.R;
  */
 public class StickerView extends View {
 
+    private Context context;
+    // 被操作的贴纸对象
     private Sticker sticker;
     // 手指按下时图片的矩阵
     private Matrix downMatrix = new Matrix();
@@ -47,17 +50,15 @@ public class StickerView extends View {
 
     public StickerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
-    }
-
-    private void init(Context context) {
-        sticker = new Sticker(context, BitmapFactory.decodeResource(getResources(), R.mipmap.ic_avatar_1));
+        this.context = context;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        sticker.draw(canvas);
+        if (sticker != null) {
+            sticker.draw(canvas);
+        }
     }
 
     // 手指按下屏幕的X坐标
@@ -93,7 +94,7 @@ public class StickerView extends View {
                     Log.d("onTouchEvent", "单点缩放手势");
                 }
                 // 平移手势验证
-                else if (sticker.isWithinImageCheck(event, downMatrix)) {
+                else if (sticker.isWithinImageCheck(event, moveMatrix)) {
                     mode = TRANS;
                     downMatrix.set(sticker.getMatrix());
                     Log.d("onTouchEvent", "平移手势");
@@ -148,5 +149,37 @@ public class StickerView extends View {
                 break;
         }
         return true;
+    }
+
+    /**
+     * 添加一个贴纸
+     *
+     * @param resource
+     */
+    public void addSticker(int resource) {
+        addSticker(BitmapFactory.decodeResource(getResources(), resource));
+    }
+
+    /**
+     * 添加一个贴纸
+     *
+     * @param drawable
+     */
+    public void addSticker(Drawable drawable) {
+        if (drawable != null && drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmap = (BitmapDrawable) drawable;
+            addSticker(bitmap);
+        }
+    }
+
+    /**
+     * 添加一个贴纸
+     *
+     * @param bitmap
+     */
+    public void addSticker(Bitmap bitmap) {
+        sticker = new Sticker(context, bitmap);
+        sticker.getMatrix().postTranslate((getWidth() - sticker.getStickerWidth()) / 2, (getHeight() - sticker.getStickerHeight()) / 2);
+        invalidate();
     }
 }
