@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,6 +19,9 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.zhouyou.gesture.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 作者：ZhouYou
@@ -39,6 +44,8 @@ public class StickerView extends ImageView {
     private StickerActionIcon rotateIcon;
     // 缩放操作图片
     private StickerActionIcon zoomIcon;
+    // 绘制图片的边框
+    private Paint paintEdge;
 
     // 触控模式
     private int mode;
@@ -47,6 +54,9 @@ public class StickerView extends ImageView {
     private static final int ROTATE = 2; // 单点旋转模式
     private static final int ZOOM_SINGLE = 3; // 单点缩放模式
     private static final int ZOOM_MULTI = 4; // 多点缩放模式
+
+    // 是否正在处于编辑
+    private boolean isEdit = true;
 
     public StickerView(Context context) {
         this(context, null);
@@ -68,6 +78,10 @@ public class StickerView extends ImageView {
         rotateIcon.setSrcIcon(R.mipmap.ic_rotate);
         zoomIcon = new StickerActionIcon(context);
         zoomIcon.setSrcIcon(R.mipmap.ic_resize);
+        paintEdge = new Paint();
+        paintEdge.setColor(Color.BLACK);
+        paintEdge.setAlpha(170);
+        paintEdge.setAntiAlias(true);
     }
 
     @Override
@@ -91,9 +105,16 @@ public class StickerView extends ImageView {
         float y3 = points[5];
         float x4 = points[6];
         float y4 = points[7];
-        // 画操作按钮图片
-        rotateIcon.draw(canvas, x2, y2);
-        zoomIcon.draw(canvas, x3, y3);
+        if (isEdit) {
+            // 画边框
+            canvas.drawLine(x1, y1, x2, y2, paintEdge);
+            canvas.drawLine(x2, y2, x4, y4, paintEdge);
+            canvas.drawLine(x4, y4, x3, y3, paintEdge);
+            canvas.drawLine(x3, y3, x1, y1, paintEdge);
+            // 画操作按钮图片
+            rotateIcon.draw(canvas, x2, y2);
+            zoomIcon.draw(canvas, x3, y3);
+        }
     }
 
     // 手指按下屏幕的X坐标
@@ -187,13 +208,38 @@ public class StickerView extends ImageView {
         return true;
     }
 
+    /**
+     * 判断手指是否在操作区域内
+     *
+     * @param sticker
+     * @param event
+     * @return
+     */
     private boolean isInStickerArea(Sticker sticker, MotionEvent event) {
         RectF dst = sticker.getSrcImageBound();
         return dst.contains(event.getX(), event.getY());
     }
 
+    /**
+     * 添加贴纸
+     *
+     * @param resId
+     */
     @Override
     public void setImageResource(int resId) {
         sticker = new Sticker(context, resId);
+    }
+
+    /**
+     * 设置是否贴纸正在处于编辑状态
+     *
+     * @param edit
+     */
+    public void setEdit(boolean edit) {
+        isEdit = edit;
+    }
+
+    public boolean isEdit() {
+        return isEdit;
     }
 }

@@ -8,6 +8,9 @@ import android.widget.FrameLayout;
 import com.zhouyou.gesture.sticker.Sticker;
 import com.zhouyou.gesture.sticker.StickerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 作者：ZhouYou
  * 日期：2016/8/25.
@@ -16,7 +19,7 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
 
     private FrameLayout flContent;
 
-    private StickerView stickerView;
+    private List<StickerView> stickerViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +28,7 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         flContent = (FrameLayout) findViewById(R.id.fl_content);
         findViewById(R.id.btn_add_sticker).setOnClickListener(this);
         findViewById(R.id.btn_delete_sticker).setOnClickListener(this);
+        stickerViews = new ArrayList<>();
     }
 
     @Override
@@ -34,7 +38,7 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
                 addSticker();
                 break;
             case R.id.btn_delete_sticker:
-                removeSticker();
+                removeStickers();
                 break;
             default:
                 break;
@@ -42,14 +46,26 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
     }
 
     private void addSticker() {
-        stickerView = new StickerView(this);
-        stickerView.setImageResource(R.mipmap.ic_avatar_1);
+        for (int i = 0; i < stickerViews.size(); i++) {
+            StickerView item = stickerViews.get(i);
+            if (item == null) continue;
+            if (item.isEdit()) {
+                item.setEdit(false);
+                item.postInvalidate();
+                stickerViews.set(i, item);
+            }
+        }
+        StickerView sv = new StickerView(this);
+        sv.setImageResource(R.mipmap.ic_avatar_1);
+        sv.setEdit(true);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-        stickerView.setLayoutParams(lp);
-        flContent.addView(stickerView);
+        sv.setLayoutParams(lp);
+        flContent.addView(sv);
+        stickerViews.add(sv);
     }
 
-    private void removeSticker() {
-        flContent.removeView(stickerView);
+    private void removeStickers() {
+        stickerViews.clear();
+        flContent.removeAllViews();
     }
 }

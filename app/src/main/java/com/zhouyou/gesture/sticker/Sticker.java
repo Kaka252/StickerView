@@ -20,8 +20,6 @@ import com.zhouyou.gesture.R;
  */
 public class Sticker {
     private Context context;
-    // 绘制图片的边框
-    private Paint paintEdge;
     // 绘制图片的矩阵
     private Matrix matrix;
     // 原图片
@@ -35,18 +33,9 @@ public class Sticker {
 
     private void init() {
         matrix = new Matrix();
-        paintEdge = new Paint();
-        paintEdge.setColor(Color.BLACK);
-        paintEdge.setAlpha(170);
-        paintEdge.setAntiAlias(true);
     }
 
     public void draw(Canvas canvas) {
-        // 画边框
-//        canvas.drawLine(x1, y1, x2, y2, paintEdge);
-//        canvas.drawLine(x2, y2, x4, y4, paintEdge);
-//        canvas.drawLine(x4, y4, x3, y3, paintEdge);
-//        canvas.drawLine(x3, y3, x1, y1, paintEdge);
         // 画图片
         canvas.drawBitmap(srcImage, matrix, null);
     }
