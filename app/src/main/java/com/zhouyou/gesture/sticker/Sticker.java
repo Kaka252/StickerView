@@ -2,6 +2,7 @@ package com.zhouyou.gesture.sticker;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -26,10 +27,9 @@ public class Sticker {
     // 原图片
     private Bitmap srcImage;
 
-
-    public Sticker(Context context, Bitmap bitmap) {
+    public Sticker(Context context, int resource) {
         this.context = context;
-        this.srcImage = bitmap;
+        this.srcImage = BitmapFactory.decodeResource(context.getResources(), resource);
         init();
     }
 
@@ -39,11 +39,9 @@ public class Sticker {
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
         paintEdge.setAntiAlias(true);
-
     }
 
     public void draw(Canvas canvas) {
-
         // 画边框
 //        canvas.drawLine(x1, y1, x2, y2, paintEdge);
 //        canvas.drawLine(x2, y2, x4, y4, paintEdge);
@@ -51,7 +49,6 @@ public class Sticker {
 //        canvas.drawLine(x3, y3, x1, y1, paintEdge);
         // 画图片
         canvas.drawBitmap(srcImage, matrix, null);
-
     }
 
     /**

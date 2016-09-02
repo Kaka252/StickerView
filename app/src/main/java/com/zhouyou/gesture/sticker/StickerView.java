@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.zhouyou.gesture.R;
 
@@ -21,7 +22,7 @@ import com.zhouyou.gesture.R;
  * 作者：ZhouYou
  * 日期：2016/8/31.
  */
-public class StickerView extends View {
+public class StickerView extends ImageView {
 
     private Context context;
     // 被操作的贴纸对象
@@ -62,6 +63,7 @@ public class StickerView extends View {
 
     private void init(Context context) {
         this.context = context;
+        setScaleType(ScaleType.MATRIX);
         rotateIcon = new StickerActionIcon(context);
         rotateIcon.setSrcIcon(R.mipmap.ic_rotate);
         zoomIcon = new StickerActionIcon(context);
@@ -69,8 +71,15 @@ public class StickerView extends View {
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (changed) {
+            sticker.getMatrix().postTranslate((getWidth() - sticker.getStickerWidth()) / 2, (getHeight() - sticker.getStickerHeight()) / 2);
+        }
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         if (sticker == null) return;
         sticker.draw(canvas);
         float[] points = StickerUtils.getBitmapPoints(sticker.getSrcImage(), sticker.getMatrix());
@@ -85,7 +94,6 @@ public class StickerView extends View {
         // 画操作按钮图片
         rotateIcon.draw(canvas, x2, y2);
         zoomIcon.draw(canvas, x3, y3);
-
     }
 
     // 手指按下屏幕的X坐标
@@ -104,6 +112,7 @@ public class StickerView extends View {
             case MotionEvent.ACTION_DOWN:
                 downX = event.getX();
                 downY = event.getY();
+                if (sticker == null) return false;
                 // 旋转手势验证
                 if (rotateIcon.isInActionCheck(event)) {
                     mode = ROTATE;
@@ -183,36 +192,8 @@ public class StickerView extends View {
         return dst.contains(event.getX(), event.getY());
     }
 
-
-    /**
-     * 添加一个贴纸
-     *
-     * @param resource
-     */
-    public void addSticker(int resource) {
-        addSticker(BitmapFactory.decodeResource(getResources(), resource));
-    }
-
-    /**
-     * 添加一个贴纸
-     *
-     * @param drawable
-     */
-    public void addSticker(Drawable drawable) {
-        if (drawable != null && drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmap = (BitmapDrawable) drawable;
-            addSticker(bitmap);
-        }
-    }
-
-    /**
-     * 添加一个贴纸
-     *
-     * @param bitmap
-     */
-    public void addSticker(Bitmap bitmap) {
-        sticker = new Sticker(context, bitmap);
-        sticker.getMatrix().postTranslate((getWidth() - sticker.getStickerWidth()) / 2, (getHeight() - sticker.getStickerHeight()) / 2);
-        invalidate();
+    @Override
+    public void setImageResource(int resId) {
+        sticker = new Sticker(context, resId);
     }
 }
