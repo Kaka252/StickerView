@@ -94,7 +94,7 @@ public class StickerLayout extends FrameLayout {
                 // 处理删除操作
                 removeView(sv);
                 stickerViews.remove(sv);
-                reset();
+                redraw();
             }
 
             @Override
@@ -115,20 +115,30 @@ public class StickerLayout extends FrameLayout {
         });
         addView(sv);
         stickerViews.add(sv);
-        reset();
+        redraw();
+    }
+
+    /**
+     * 查看贴纸的预览操作
+     */
+    public void getPreview() {
+        for (StickerView item : stickerViews) {
+            if (item == null) continue;
+            item.setEdit(false);
+        }
     }
 
     /**
      * 重置贴纸的操作列表
      */
-    private void reset() {
-        reset(true);
+    private void redraw() {
+        redraw(true);
     }
 
     /**
      * 重置贴纸的操作列表
      */
-    private void reset(boolean isNotGenerate) {
+    private void redraw(boolean isNotGenerate) {
         int size = stickerViews.size();
         if (size <= 0) return;
         for (int i = size - 1; i >= 0; i--) {
@@ -149,7 +159,7 @@ public class StickerLayout extends FrameLayout {
      * @return
      */
     public Bitmap generateCombinedBitmap() {
-        reset(false);
+        redraw(false);
         Bitmap dst = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(dst);
         draw(canvas);

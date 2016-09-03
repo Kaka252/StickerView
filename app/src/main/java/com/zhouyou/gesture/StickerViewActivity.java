@@ -32,11 +32,15 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         stickerLayout.setBackgroundImage(R.mipmap.bg_scene);
         findViewById(R.id.tv_add_sticker).setOnClickListener(this);
         findViewById(R.id.tv_generate_preview).setOnClickListener(this);
+        findViewById(R.id.tv_get_preview).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.tv_get_preview:
+                stickerLayout.getPreview();
+                break;
             case R.id.tv_add_sticker:
                 Intent intent = new Intent(this, StickerSelectorListActivity.class);
                 startActivityForResult(intent, 200);

@@ -4,36 +4,54 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dip"
-        android:background="@android:color/black"
-        android:gravity="center_vertical|right"
-        android:orientation="horizontal">
+        android:background="@android:color/black">
 
         <TextView
-            android:id="@+id/tv_add_sticker"
+            android:id="@+id/tv_get_preview"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:gravity="center"
             android:paddingLeft="10dip"
             android:paddingRight="10dip"
-            android:text="选择贴纸"
+            android:text="查看预览"
             android:textColor="@android:color/white"
             android:textSize="16dip" />
 
-        <TextView
-            android:id="@+id/tv_generate_preview"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:text="合成"
-            android:textColor="@android:color/white"
-            android:textSize="16dip" />
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_add_sticker"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:text="选择贴纸"
+                android:textColor="@android:color/white"
+                android:textSize="16dip" />
+
+            <TextView
+                android:id="@+id/tv_generate_preview"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:text="合成"
+                android:textColor="@android:color/white"
+                android:textSize="16dip" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <com.zhouyou.gesture.sticker.StickerLayout
         android:id="@+id/sticker_layout"
