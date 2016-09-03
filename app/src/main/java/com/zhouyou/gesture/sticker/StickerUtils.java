@@ -55,17 +55,16 @@ public class StickerUtils {
      * @return
      */
     public static String saveBitmap(Bitmap bitmap) {
-        String imagePath = App.get().getFilesDir().getAbsolutePath() + "/zhouyou.png";
+        String imagePath = App.get().getFilesDir().getAbsolutePath() + "/zhouyou.jpg";
         File file = new File(imagePath);
         if (file.exists()) {
             file.delete();
         }
         try {
-            FileOutputStream out = new FileOutputStream(file);
-            if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)) {
-                out.flush();
-                out.close();
-            }
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

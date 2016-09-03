@@ -2,14 +2,11 @@ package com.zhouyou.gesture;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.zhouyou.gesture.sticker.StickerUtils;
-
-import java.io.File;
 
 /**
  * 作者：ZhouYou
@@ -29,8 +26,6 @@ public class PreviewActivity extends Activity {
         }
         setContentView(R.layout.activity_preview);
         ImageView ivPreview = (ImageView) findViewById(R.id.iv_preview);
-
-        File file = new File(path);
-        ivPreview.setImageURI(StickerUtils.getFileUri(file));
+        ivPreview.setImageURI(Uri.parse(path));
     }
 }

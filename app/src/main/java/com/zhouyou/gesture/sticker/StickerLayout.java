@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,10 +72,6 @@ public class StickerLayout extends FrameLayout {
         ivImage.setImageBitmap(bitmap);
     }
 
-    public void setBackgroundURI(URI uri) {
-
-    }
-
     /**
      * 新增贴纸
      */
@@ -126,13 +121,20 @@ public class StickerLayout extends FrameLayout {
      * 重置贴纸的操作列表
      */
     private void reset() {
+        reset(true);
+    }
+
+    /**
+     * 重置贴纸的操作列表
+     */
+    private void reset(boolean isNotGenerate) {
         int size = stickerViews.size();
         if (size <= 0) return;
         for (int i = size - 1; i >= 0; i--) {
             StickerView item = stickerViews.get(i);
             if (item == null) continue;
             if (i == size - 1) {
-                item.setEdit(true);
+                item.setEdit(isNotGenerate);
             } else {
                 item.setEdit(false);
             }
@@ -146,21 +148,10 @@ public class StickerLayout extends FrameLayout {
      * @return
      */
     public Bitmap generateCombinedBitmap() {
+        reset(false);
         Bitmap dstBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(dstBitmap);
-        // 画背景
-        canvas.drawBitmap(bgBitmap, 0, 0, null);
-        // 画水印
-        for (StickerView view : stickerViews) {
-            if (view == null
-                    || view.getSticker() == null
-                    || view.getSticker().getSrcImage() == null
-                    || view.getSticker().getMatrix() == null) continue;
-            canvas.drawBitmap(view.getSticker().getSrcImage(), view.getSticker().getMatrix(), null);
-        }
-        canvas.save(Canvas.ALL_SAVE_FLAG);
-        canvas.restore();
-        // 根据最终的bitmap在本地生成路径
+        draw(canvas);
         return dstBitmap;
     }
 }
