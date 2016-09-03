@@ -3,16 +3,19 @@ package com.zhouyou.gesture.sticker;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 作者：ZhouYou
  * 日期：2016/9/3.
+ * 贴纸的使用控件
  */
 public class StickerLayout extends FrameLayout {
 
@@ -23,6 +26,8 @@ public class StickerLayout extends FrameLayout {
     private FrameLayout.LayoutParams stickerParams;
     // 背景图片控件
     private ImageView ivImage;
+    // 背景图片的位图
+    private Bitmap bgBitmap;
 
     public StickerLayout(Context context) {
         this(context, null);
@@ -59,11 +64,17 @@ public class StickerLayout extends FrameLayout {
      * 设置背景图片
      */
     public void setBackgroundImage(int resource) {
+        bgBitmap = BitmapFactory.decodeResource(context.getResources(), resource);
         ivImage.setImageResource(resource);
     }
 
     public void setBackgroundImage(Bitmap bitmap) {
+        this.bgBitmap = bitmap;
         ivImage.setImageBitmap(bitmap);
+    }
+
+    public void setBackgroundURI(URI uri) {
+
     }
 
     /**
@@ -127,5 +138,29 @@ public class StickerLayout extends FrameLayout {
             }
             stickerViews.set(i, item);
         }
+    }
+
+    /**
+     * 生成合成图片
+     *
+     * @return
+     */
+    public Bitmap generateCombinedBitmap() {
+        Bitmap dstBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(dstBitmap);
+        // 画背景
+        canvas.drawBitmap(bgBitmap, 0, 0, null);
+        // 画水印
+        for (StickerView view : stickerViews) {
+            if (view == null
+                    || view.getSticker() == null
+                    || view.getSticker().getSrcImage() == null
+                    || view.getSticker().getMatrix() == null) continue;
+            canvas.drawBitmap(view.getSticker().getSrcImage(), view.getSticker().getMatrix(), null);
+        }
+        canvas.save(Canvas.ALL_SAVE_FLAG);
+        canvas.restore();
+        // 根据最终的bitmap在本地生成路径
+        return dstBitmap;
     }
 }

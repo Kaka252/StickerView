@@ -16,10 +16,10 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/btn_add_sticker"
+            android:id="@+id/btn_generate_preview"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="添加贴纸" />
+            android:text="生成预览" />
     </LinearLayout>
 </LinearLayout>

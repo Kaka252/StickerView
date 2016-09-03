@@ -247,6 +247,15 @@ public class StickerView extends ImageView {
         sticker = new Sticker(context, BitmapFactory.decodeResource(context.getResources(), resId));
     }
 
+    /**
+     * 获取贴纸对象
+     *
+     * @return
+     */
+    public Sticker getSticker() {
+        return sticker;
+    }
+
     @Override
     public void setImageBitmap(Bitmap bm) {
         sticker = new Sticker(context, bm);
