@@ -62,16 +62,18 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
 
             @Override
             public void onEdit(StickerView stickerView) {
-
+                int position = stickerViews.indexOf(stickerView);
                 stickerView.setEdit(true);
                 stickerView.bringToFront();
-//                int position = stickerViews.indexOf(stickerView);
-//                if (position == stickerViews.size() - 1) return;
-//                if (position < 0 && position >= stickerViews.size()) return;
-//                Log.d("Sticker", "onEdit: " + position + " | size = " + stickerViews.size());
-//                StickerView removedSticker = stickerViews.remove(position);
-//                stickerViews.add(stickerViews.size(), removedSticker);
-//                reset();
+
+                int size = stickerViews.size();
+                for (int i = 0; i < size; i++) {
+                    StickerView item = stickerViews.get(i);
+                    if (item == null) continue;
+                    if (position != i) {
+                        item.setEdit(false);
+                    }
+                }
             }
         });
         flContent.addView(sv);
@@ -88,7 +90,6 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
             StickerView item = stickerViews.get(i);
             if (item == null) continue;
             if (i == size - 1) {
-                item.bringToFront();
                 item.setEdit(true);
             } else {
                 item.setEdit(false);
