@@ -2,6 +2,7 @@ package com.zhouyou.gesture;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -61,11 +62,16 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
 
             @Override
             public void onEdit(StickerView stickerView) {
-                int position = stickerViews.indexOf(stickerView);
-                if (position == stickerViews.size() - 1) return;
-                StickerView removedSticker = stickerViews.remove(position);
-                stickerViews.add(stickerViews.size(), removedSticker);
-                reset();
+
+                stickerView.setEdit(true);
+                stickerView.bringToFront();
+//                int position = stickerViews.indexOf(stickerView);
+//                if (position == stickerViews.size() - 1) return;
+//                if (position < 0 && position >= stickerViews.size()) return;
+//                Log.d("Sticker", "onEdit: " + position + " | size = " + stickerViews.size());
+//                StickerView removedSticker = stickerViews.remove(position);
+//                stickerViews.add(stickerViews.size(), removedSticker);
+//                reset();
             }
         });
         flContent.addView(sv);

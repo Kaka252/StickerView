@@ -142,7 +142,9 @@ public class StickerView extends ImageView {
                 if (sticker == null) return false;
                 // 删除操作
                 if (deleteIcon.isInActionCheck(event)) {
-                    if (listener != null) listener.onDelete();
+                    if (listener != null) {
+                        listener.onDelete();
+                    }
                 }
                 // 旋转手势验证
                 else if (rotateIcon.isInActionCheck(event)) {
