@@ -19,24 +19,22 @@ import com.zhouyou.gesture.R;
  * 日期：2016/8/31.
  */
 public class Sticker {
-    private Context context;
     // 绘制图片的矩阵
     private Matrix matrix;
     // 原图片
     private Bitmap srcImage;
 
     public Sticker(Context context, int resource) {
-        this.context = context;
         this.srcImage = BitmapFactory.decodeResource(context.getResources(), resource);
-        init();
-    }
-
-    private void init() {
         matrix = new Matrix();
     }
 
+    /**
+     * 绘制图片
+     *
+     * @param canvas
+     */
     public void draw(Canvas canvas) {
-        // 画图片
         canvas.drawBitmap(srcImage, matrix, null);
     }
 

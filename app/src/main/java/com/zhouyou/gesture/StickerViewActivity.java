@@ -21,14 +21,16 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
 
     private List<StickerView> stickerViews;
 
+    private FrameLayout.LayoutParams lp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sticker_view);
         flContent = (FrameLayout) findViewById(R.id.fl_content);
         findViewById(R.id.btn_add_sticker).setOnClickListener(this);
-        findViewById(R.id.btn_delete_sticker).setOnClickListener(this);
         stickerViews = new ArrayList<>();
+        lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
     }
 
     @Override
@@ -36,9 +38,7 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         switch (v.getId()) {
             case R.id.btn_add_sticker:
                 addSticker();
-                break;
-            case R.id.btn_delete_sticker:
-                removeStickers();
+                reset();
                 break;
             default:
                 break;
@@ -46,26 +46,38 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
     }
 
     private void addSticker() {
-        for (int i = 0; i < stickerViews.size(); i++) {
-            StickerView item = stickerViews.get(i);
-            if (item == null) continue;
-            if (item.isEdit()) {
-                item.setEdit(false);
-                item.postInvalidate();
-                stickerViews.set(i, item);
-            }
-        }
-        StickerView sv = new StickerView(this);
+        final StickerView sv = new StickerView(this);
         sv.setImageResource(R.mipmap.ic_avatar_1);
         sv.setEdit(true);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         sv.setLayoutParams(lp);
+        sv.setOnStickerActionListener(new StickerView.OnStickerActionListener() {
+            @Override
+            public void delete() {
+                // 处理删除操作
+                flContent.removeView(sv);
+                stickerViews.remove(sv);
+                reset();
+            }
+        });
         flContent.addView(sv);
         stickerViews.add(sv);
     }
 
-    private void removeStickers() {
-        stickerViews.clear();
-        flContent.removeAllViews();
+    /**
+     * 重置贴纸的操作列表
+     */
+    private void reset() {
+        int size = stickerViews.size();
+        for (int i = size - 1; i >= 0; i--) {
+            StickerView item = stickerViews.get(i);
+            if (item == null) continue;
+            if (i == size - 1) {
+                item.setEdit(true);
+            } else {
+                item.setEdit(false);
+            }
+            item.postInvalidate();
+            stickerViews.set(i, item);
+        }
     }
 }

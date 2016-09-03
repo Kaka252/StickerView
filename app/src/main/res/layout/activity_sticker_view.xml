@@ -21,14 +21,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="添加贴纸" />
-
-        <Button
-            android:id="@+id/btn_delete_sticker"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="删除贴纸" />
     </LinearLayout>
-
-
 </LinearLayout>
