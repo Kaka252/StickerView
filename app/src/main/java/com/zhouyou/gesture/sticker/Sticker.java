@@ -24,8 +24,8 @@ public class Sticker {
     // 原图片
     private Bitmap srcImage;
 
-    public Sticker(Context context, int resource) {
-        this.srcImage = BitmapFactory.decodeResource(context.getResources(), resource);
+    public Sticker(Context context, Bitmap bitmap) {
+        this.srcImage = bitmap;
         matrix = new Matrix();
     }
 

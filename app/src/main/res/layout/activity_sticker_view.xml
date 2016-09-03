@@ -5,11 +5,11 @@
     android:background="@android:color/holo_blue_bright"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/fl_content"
+    <com.zhouyou.gesture.sticker.StickerLayout
+        android:id="@+id/sticker_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_height="0dip"
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -244,7 +244,12 @@ public class StickerView extends ImageView {
      */
     @Override
     public void setImageResource(int resId) {
-        sticker = new Sticker(context, resId);
+        sticker = new Sticker(context, BitmapFactory.decodeResource(context.getResources(), resId));
+    }
+
+    @Override
+    public void setImageBitmap(Bitmap bm) {
+        sticker = new Sticker(context, bm);
     }
 
     /**
@@ -256,11 +261,6 @@ public class StickerView extends ImageView {
         isEdit = edit;
         postInvalidate();
     }
-
-    public boolean isEdit() {
-        return isEdit;
-    }
-
 
     private OnStickerActionListener listener;
 

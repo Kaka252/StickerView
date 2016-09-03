@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.zhouyou.gesture.sticker.Sticker;
+import com.zhouyou.gesture.sticker.StickerLayout;
 import com.zhouyou.gesture.sticker.StickerView;
 
 import java.util.ArrayList;
@@ -18,83 +19,24 @@ import java.util.List;
  */
 public class StickerViewActivity extends Activity implements View.OnClickListener {
 
-    private FrameLayout flContent;
-
-    private List<StickerView> stickerViews;
-
-    private FrameLayout.LayoutParams lp;
+    private StickerLayout stickerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sticker_view);
-        flContent = (FrameLayout) findViewById(R.id.fl_content);
         findViewById(R.id.btn_add_sticker).setOnClickListener(this);
-        stickerViews = new ArrayList<>();
-        lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        stickerLayout = (StickerLayout) findViewById(R.id.sticker_layout);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add_sticker:
-                addSticker();
-                reset();
+                stickerLayout.addSticker(R.mipmap.ic_avatar_2);
                 break;
             default:
                 break;
-        }
-    }
-
-    private void addSticker() {
-        final StickerView sv = new StickerView(this);
-        sv.setImageResource(R.mipmap.ic_avatar_1);
-        sv.setEdit(true);
-        sv.setLayoutParams(lp);
-        sv.setOnStickerActionListener(new StickerView.OnStickerActionListener() {
-            @Override
-            public void onDelete() {
-                // 处理删除操作
-                flContent.removeView(sv);
-                stickerViews.remove(sv);
-                reset();
-            }
-
-            @Override
-            public void onEdit(StickerView stickerView) {
-                int position = stickerViews.indexOf(stickerView);
-                stickerView.setEdit(true);
-                stickerView.bringToFront();
-
-                int size = stickerViews.size();
-                for (int i = 0; i < size; i++) {
-                    StickerView item = stickerViews.get(i);
-                    if (item == null) continue;
-                    if (position != i) {
-                        item.setEdit(false);
-                    }
-                }
-            }
-        });
-        flContent.addView(sv);
-        stickerViews.add(sv);
-    }
-
-    /**
-     * 重置贴纸的操作列表
-     */
-    private void reset() {
-        int size = stickerViews.size();
-        if (size <= 0) return;
-        for (int i = size - 1; i >= 0; i--) {
-            StickerView item = stickerViews.get(i);
-            if (item == null) continue;
-            if (i == size - 1) {
-                item.setEdit(true);
-            } else {
-                item.setEdit(false);
-            }
-            stickerViews.set(i, item);
         }
     }
 }
