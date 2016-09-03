@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,9 +150,11 @@ public class StickerLayout extends FrameLayout {
      */
     public Bitmap generateCombinedBitmap() {
         reset(false);
-        Bitmap dstBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(dstBitmap);
+        Bitmap dst = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(dst);
         draw(canvas);
-        return dstBitmap;
+        return dst;
     }
+
+
 }

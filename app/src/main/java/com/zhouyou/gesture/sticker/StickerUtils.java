@@ -1,6 +1,7 @@
 package com.zhouyou.gesture.sticker;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import com.zhouyou.gesture.base.App;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by zhouyou on 16/9/1.
@@ -34,18 +36,17 @@ public class StickerUtils {
     }
 
     /**
-     * 获取资源的URI
+     * 获取临时图片的缓存路径
      *
-     * @param resId
      * @return
      */
-    public static Uri getResouceUri(int resId) {
-        return Uri.parse("res://" + App.get().getPackageName() + "/" + resId);
-    }
-
-    public static Uri getFileUri(File file) {
-        if (file == null || !file.exists()) return null;
-        return Uri.parse("file://" + file.getAbsolutePath());
+    public static File getCacheFile() {
+        File file = new File(App.get().getAppCacheDir(), "image");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        String fileName = "temp_" + System.currentTimeMillis() + ".jpg";
+        return new File(file, fileName);
     }
 
     /**
@@ -54,20 +55,86 @@ public class StickerUtils {
      * @param bitmap
      * @return
      */
-    public static String saveBitmap(Bitmap bitmap) {
-        String imagePath = App.get().getFilesDir().getAbsolutePath() + "/zhouyou.jpg";
-        File file = new File(imagePath);
-        if (file.exists()) {
-            file.delete();
-        }
+    public static boolean saveBitmap(Bitmap bitmap, File file) {
+        if (bitmap == null) return false;
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
-            fos.close();
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return imagePath;
+        return false;
+    }
+
+    public static Bitmap getSmallBitmap(String filePath, int reqWidth) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        //该值设为true那么将不返回实际的bitmap不给其分配内存空间而里面只包括一些解码边界信息即图片大小信息
+        options.inJustDecodeBounds = true;//inJustDecodeBounds设置为true，可以不把图片读到内存中,但依然可以计算出图片的大小
+        BitmapFactory.decodeFile(filePath, options);
+        float ow = options.outWidth;
+        float oh = options.outHeight;
+        float bl = 1;
+        if (ow > reqWidth) {
+            bl = reqWidth / ow;
+        }
+        ow = ow * bl;
+        oh = oh * bl;
+        int inSampleSize = computeSampleSize(options, -1, (int) (ow * oh));
+        if (inSampleSize <= 0) {
+            inSampleSize = 1;
+        }
+        options.inSampleSize = inSampleSize;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inJustDecodeBounds = false;//重新读入图片，注意这次要把options.inJustDecodeBounds 设为 false
+        return BitmapFactory.decodeFile(filePath, options);// BitmapFactory.decodeFile()按指定大小取得图片缩略图
+    }
+
+    public static int computeSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+        int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);
+        int roundedSize;
+        if (initialSize <= 8) {
+            roundedSize = 1;
+            while (roundedSize < initialSize) {
+                roundedSize <<= 1;
+            }
+        } else {
+            roundedSize = (initialSize + 7) / 8 * 8;
+        }
+        return roundedSize;
+    }
+
+    private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+        double w = options.outWidth;
+        double h = options.outHeight;
+        int lowerBound = (maxNumOfPixels == -1) ? 1 : (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));
+        int upperBound = (minSideLength == -1) ? 128 : (int) Math.min(Math.floor(w / minSideLength), Math.floor(h / minSideLength));
+        if (upperBound < lowerBound) {
+            // return the larger one when there is no overlapping zone.
+            return lowerBound;
+        }
+        if ((maxNumOfPixels == -1) && (minSideLength == -1)) {
+            return 1;
+        } else if (minSideLength == -1) {
+            return lowerBound;
+        } else {
+            return upperBound;
+        }
+    }
+
+    public static void recycle(Bitmap bitmap) {
+        if (bitmap != null && !bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
     }
 }
