@@ -87,7 +87,6 @@ public class StickerLayout extends FrameLayout {
     public void addSticker(Bitmap bitmap) {
         final StickerView sv = new StickerView(context);
         sv.setImageBitmap(bitmap);
-        sv.setEdit(true);
         sv.setLayoutParams(stickerParams);
         sv.setOnStickerActionListener(new StickerView.OnStickerActionListener() {
             @Override
@@ -116,6 +115,7 @@ public class StickerLayout extends FrameLayout {
         });
         addView(sv);
         stickerViews.add(sv);
+        reset();
     }
 
     /**

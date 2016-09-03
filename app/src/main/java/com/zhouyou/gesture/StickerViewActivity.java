@@ -6,10 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -42,7 +38,8 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_add_sticker:
-                stickerLayout.addSticker(R.mipmap.ic_avatar_2);
+                Intent intent = new Intent(this, StickerSelectorListActivity.class);
+                startActivityForResult(intent, 200);
                 break;
             case R.id.tv_generate_preview:
                 Bitmap dstBitmap = stickerLayout.generateCombinedBitmap();
@@ -96,6 +93,15 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
             return true;
         }
     });
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null && resultCode == RESULT_OK && requestCode == 200) {
+            int resource = data.getIntExtra("res", 0);
+            stickerLayout.addSticker(resource);
+        }
+    }
 
     @Override
     protected void onDestroy() {

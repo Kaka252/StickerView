@@ -18,7 +18,7 @@
             android:gravity="center"
             android:paddingLeft="10dip"
             android:paddingRight="10dip"
-            android:text="添加"
+            android:text="选择贴纸"
             android:textColor="@android:color/white"
             android:textSize="16dip" />
 

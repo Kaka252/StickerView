@@ -30,6 +30,9 @@
         <activity
             android:name=".PreviewActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".StickerSelectorListActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
