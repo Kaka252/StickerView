@@ -6,6 +6,10 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -28,16 +32,19 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sticker_view);
-        findViewById(R.id.btn_generate_preview).setOnClickListener(this);
         stickerLayout = (StickerLayout) findViewById(R.id.sticker_layout);
         stickerLayout.setBackgroundImage(R.mipmap.bg_scene);
-        stickerLayout.addSticker(R.mipmap.ic_avatar_2);
+        findViewById(R.id.tv_add_sticker).setOnClickListener(this);
+        findViewById(R.id.tv_generate_preview).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_generate_preview:
+            case R.id.tv_add_sticker:
+                stickerLayout.addSticker(R.mipmap.ic_avatar_2);
+                break;
+            case R.id.tv_generate_preview:
                 Bitmap dstBitmap = stickerLayout.generateCombinedBitmap();
                 task = new CompressTask(dstBitmap);
                 t = new Thread(task);
