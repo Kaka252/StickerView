@@ -5,8 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
-
-import com.zhouyou.gesture.R;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,9 @@ public class StickerLayout extends FrameLayout {
     // 贴纸的集合
     private List<StickerView> stickerViews;
     // 贴纸的View参数
-    private FrameLayout.LayoutParams lp;
+    private FrameLayout.LayoutParams stickerParams;
+    // 背景图片控件
+    private ImageView ivImage;
 
     public StickerLayout(Context context) {
         this(context, null);
@@ -39,7 +40,30 @@ public class StickerLayout extends FrameLayout {
     private void init(Context context) {
         this.context = context;
         stickerViews = new ArrayList<>();
-        lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        stickerParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        addBackgroundImage();
+    }
+
+    /**
+     * 初始化背景图片控件
+     */
+    private void addBackgroundImage() {
+        FrameLayout.LayoutParams bgParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        ivImage = new ImageView(context);
+        ivImage.setScaleType(ImageView.ScaleType.FIT_XY);
+        ivImage.setLayoutParams(bgParams);
+        addView(ivImage);
+    }
+
+    /**
+     * 设置背景图片
+     */
+    public void setBackgroundImage(int resource) {
+        ivImage.setImageResource(resource);
+    }
+
+    public void setBackgroundImage(Bitmap bitmap) {
+        ivImage.setImageBitmap(bitmap);
     }
 
     /**
@@ -57,7 +81,7 @@ public class StickerLayout extends FrameLayout {
         final StickerView sv = new StickerView(context);
         sv.setImageBitmap(bitmap);
         sv.setEdit(true);
-        sv.setLayoutParams(lp);
+        sv.setLayoutParams(stickerParams);
         sv.setOnStickerActionListener(new StickerView.OnStickerActionListener() {
             @Override
             public void onDelete() {

@@ -27,6 +27,7 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         setContentView(R.layout.activity_sticker_view);
         findViewById(R.id.btn_add_sticker).setOnClickListener(this);
         stickerLayout = (StickerLayout) findViewById(R.id.sticker_layout);
+        stickerLayout.setBackgroundImage(R.mipmap.bg_scene);
     }
 
     @Override
