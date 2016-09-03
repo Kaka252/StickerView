@@ -52,10 +52,19 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         sv.setLayoutParams(lp);
         sv.setOnStickerActionListener(new StickerView.OnStickerActionListener() {
             @Override
-            public void delete() {
+            public void onDelete() {
                 // 处理删除操作
                 flContent.removeView(sv);
                 stickerViews.remove(sv);
+                reset();
+            }
+
+            @Override
+            public void onEdit(StickerView stickerView) {
+                int position = stickerViews.indexOf(stickerView);
+                if (position == stickerViews.size() - 1) return;
+                StickerView removedSticker = stickerViews.remove(position);
+                stickerViews.add(stickerViews.size(), removedSticker);
                 reset();
             }
         });
@@ -68,15 +77,16 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
      */
     private void reset() {
         int size = stickerViews.size();
+        if (size <= 0) return;
         for (int i = size - 1; i >= 0; i--) {
             StickerView item = stickerViews.get(i);
             if (item == null) continue;
             if (i == size - 1) {
+                item.bringToFront();
                 item.setEdit(true);
             } else {
                 item.setEdit(false);
             }
-            item.postInvalidate();
             stickerViews.set(i, item);
         }
     }

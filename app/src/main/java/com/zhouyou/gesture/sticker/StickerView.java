@@ -134,15 +134,15 @@ public class StickerView extends ImageView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = MotionEventCompat.getActionMasked(event);
+        boolean isStickerOnEdit = true;
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 downX = event.getX();
                 downY = event.getY();
                 if (sticker == null) return false;
-                if (!isEdit) return false;
                 // 删除操作
                 if (deleteIcon.isInActionCheck(event)) {
-                    if (listener != null) listener.delete();
+                    if (listener != null) listener.onDelete();
                 }
                 // 旋转手势验证
                 else if (rotateIcon.isInActionCheck(event)) {
@@ -165,6 +165,8 @@ public class StickerView extends ImageView {
                     mode = TRANS;
                     downMatrix.set(sticker.getMatrix());
                     Log.d("onTouchEvent", "平移手势");
+                } else {
+                    isStickerOnEdit = false;
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN: // 多点触控
@@ -215,7 +217,10 @@ public class StickerView extends ImageView {
             default:
                 break;
         }
-        return true;
+        if (isStickerOnEdit && listener != null) {
+            listener.onEdit(this);
+        }
+        return isStickerOnEdit;
     }
 
     /**
@@ -247,6 +252,7 @@ public class StickerView extends ImageView {
      */
     public void setEdit(boolean edit) {
         isEdit = edit;
+        postInvalidate();
     }
 
     public boolean isEdit() {
@@ -261,6 +267,10 @@ public class StickerView extends ImageView {
     }
 
     public interface OnStickerActionListener {
-        void delete();
+        /*删除贴纸*/
+        void onDelete();
+
+        /*编辑贴纸*/
+        void onEdit(StickerView stickerView);
     }
 }
