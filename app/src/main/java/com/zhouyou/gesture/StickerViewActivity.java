@@ -20,9 +20,11 @@ import java.io.File;
  */
 public class StickerViewActivity extends Activity implements View.OnClickListener {
 
+    // 贴纸布局控件
     private StickerLayout stickerLayout;
-    private Thread t;
+    // 压缩图片的任务线程
     private CompressTask task;
+    private Thread t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
