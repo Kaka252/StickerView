@@ -56,6 +56,9 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         }
     }
 
+    /**
+     * 关于图片压缩
+     */
     private class CompressTask implements Runnable {
 
         private Bitmap dstBitmap;
