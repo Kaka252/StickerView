@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +25,6 @@ public class StickerLayout extends FrameLayout {
     private FrameLayout.LayoutParams stickerParams;
     // 背景图片控件
     private ImageView ivImage;
-    // 背景图片的位图
-    private Bitmap bgBitmap;
 
     public StickerLayout(Context context) {
         this(context, null);
@@ -64,13 +61,7 @@ public class StickerLayout extends FrameLayout {
      * 设置背景图片
      */
     public void setBackgroundImage(int resource) {
-        bgBitmap = BitmapFactory.decodeResource(context.getResources(), resource);
         ivImage.setImageResource(resource);
-    }
-
-    public void setBackgroundImage(Bitmap bitmap) {
-        this.bgBitmap = bitmap;
-        ivImage.setImageBitmap(bitmap);
     }
 
     /**

@@ -9,19 +9,13 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.zhouyou.gesture.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 作者：ZhouYou
@@ -81,7 +75,7 @@ public class StickerView extends ImageView {
         zoomIcon = new StickerActionIcon(context);
         zoomIcon.setSrcIcon(R.mipmap.ic_resize);
         deleteIcon = new StickerActionIcon(context);
-        deleteIcon.setSrcIcon(R.mipmap.ic_delete);
+        deleteIcon.setSrcIcon(R.mipmap.ic_remove);
         paintEdge = new Paint();
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
