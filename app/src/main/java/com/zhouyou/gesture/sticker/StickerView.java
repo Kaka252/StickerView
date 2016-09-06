@@ -39,7 +39,7 @@ public class StickerView extends ImageView {
     // 缩放操作图片
     private StickerActionIcon zoomIcon;
     // 缩放操作图片
-    private StickerActionIcon deleteIcon;
+    private StickerActionIcon removeIcon;
     // 绘制图片的边框
     private Paint paintEdge;
 
@@ -74,8 +74,8 @@ public class StickerView extends ImageView {
         rotateIcon.setSrcIcon(R.mipmap.ic_rotate);
         zoomIcon = new StickerActionIcon(context);
         zoomIcon.setSrcIcon(R.mipmap.ic_resize);
-        deleteIcon = new StickerActionIcon(context);
-        deleteIcon.setSrcIcon(R.mipmap.ic_remove);
+        removeIcon = new StickerActionIcon(context);
+        removeIcon.setSrcIcon(R.mipmap.ic_remove);
         paintEdge = new Paint();
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
@@ -112,7 +112,7 @@ public class StickerView extends ImageView {
             // 画操作按钮图片
             rotateIcon.draw(canvas, x2, y2);
             zoomIcon.draw(canvas, x3, y3);
-            deleteIcon.draw(canvas, x1, y1);
+            removeIcon.draw(canvas, x1, y1);
         }
     }
 
@@ -135,7 +135,7 @@ public class StickerView extends ImageView {
                 downY = event.getY();
                 if (sticker == null) return false;
                 // 删除操作
-                if (deleteIcon.isInActionCheck(event)) {
+                if (removeIcon.isInActionCheck(event)) {
                     if (listener != null) {
                         listener.onDelete();
                     }
