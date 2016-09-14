@@ -238,7 +238,7 @@ public class StickerView extends ImageView {
      */
     @Override
     public void setImageResource(int resId) {
-        sticker = new Sticker(context, BitmapFactory.decodeResource(context.getResources(), resId));
+        sticker = new Sticker(BitmapFactory.decodeResource(context.getResources(), resId));
     }
 
     /**
@@ -252,7 +252,7 @@ public class StickerView extends ImageView {
 
     @Override
     public void setImageBitmap(Bitmap bm) {
-        sticker = new Sticker(context, bm);
+        sticker = new Sticker(bm);
     }
 
     /**

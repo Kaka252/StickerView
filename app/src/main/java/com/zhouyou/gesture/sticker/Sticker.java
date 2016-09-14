@@ -1,18 +1,11 @@
 package com.zhouyou.gesture.sticker;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
-
-import com.zhouyou.gesture.R;
 
 /**
  * 作者：ZhouYou
@@ -24,7 +17,7 @@ public class Sticker {
     // 原图片
     private Bitmap srcImage;
 
-    public Sticker(Context context, Bitmap bitmap) {
+    public Sticker(Bitmap bitmap) {
         this.srcImage = bitmap;
         matrix = new Matrix();
     }
