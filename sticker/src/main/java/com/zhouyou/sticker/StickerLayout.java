@@ -85,7 +85,7 @@ public class StickerLayout extends FrameLayout {
         final StickerView sv = new StickerView(context);
         sv.setImageBitmap(bitmap);
         sv.setLayoutParams(stickerParams);
-        sv.setOnStickerActionListener(new StickerView.OnStickerActionListener() {
+        sv.setOnStickerActionListener(new OnStickerActionListener() {
             @Override
             public void onDelete() {
                 // 处理删除操作

@@ -36,26 +36,23 @@ public class StickerView extends ImageView {
     private PointF imageMidPoint = new PointF();
     // 旋转操作图片
     private StickerActionIcon rotateIcon;
-    private int rotateRes;
     // 缩放操作图片
     private StickerActionIcon zoomIcon;
-    private int zoomRes;
     // 缩放操作图片
     private StickerActionIcon removeIcon;
-    private int removeRes;
     // 绘制图片的边框
     private Paint paintEdge;
 
     // 触控模式
     private int mode;
-    private static final int NONE = 0; // 无模式
-    private static final int TRANS = 1; // 拖拽模式
-    private static final int ROTATE = 2; // 单点旋转模式
-    private static final int ZOOM_SINGLE = 3; // 单点缩放模式
-    private static final int ZOOM_MULTI = 4; // 多点缩放模式
-
     // 是否正在处于编辑
     private boolean isEdit = true;
+    // 贴纸的操作监听
+    private OnStickerActionListener listener;
+
+    public void setOnStickerActionListener(OnStickerActionListener listener) {
+        this.listener = listener;
+    }
 
     public StickerView(Context context) {
         this(context, null);
@@ -74,11 +71,8 @@ public class StickerView extends ImageView {
         this.context = context;
         setScaleType(ScaleType.MATRIX);
         rotateIcon = new StickerActionIcon(context);
-//        rotateIcon.setSrcIcon(R.mipmap.ic_rotate);
         zoomIcon = new StickerActionIcon(context);
-//        zoomIcon.setSrcIcon(R.mipmap.ic_resize);
         removeIcon = new StickerActionIcon(context);
-//        removeIcon.setSrcIcon(R.mipmap.ic_remove);
         paintEdge = new Paint();
         paintEdge.setColor(Color.BLACK);
         paintEdge.setAlpha(170);
@@ -145,7 +139,7 @@ public class StickerView extends ImageView {
                 }
                 // 旋转手势验证
                 else if (rotateIcon.isInActionCheck(event)) {
-                    mode = ROTATE;
+                    mode = ActionMode.ROTATE;
                     downMatrix.set(sticker.getMatrix());
                     imageMidPoint = sticker.getImageMidPoint(downMatrix);
                     oldRotation = sticker.getSpaceRotation(event, imageMidPoint);
@@ -153,7 +147,7 @@ public class StickerView extends ImageView {
                 }
                 // 单点缩放手势验证
                 else if (zoomIcon.isInActionCheck(event)) {
-                    mode = ZOOM_SINGLE;
+                    mode = ActionMode.ZOOM_SINGLE;
                     downMatrix.set(sticker.getMatrix());
                     imageMidPoint = sticker.getImageMidPoint(downMatrix);
                     oldDistance = sticker.getSingleTouchDistance(event, imageMidPoint);
@@ -161,7 +155,7 @@ public class StickerView extends ImageView {
                 }
                 // 平移手势验证
                 else if (isInStickerArea(sticker, event)) {
-                    mode = TRANS;
+                    mode = ActionMode.TRANS;
                     downMatrix.set(sticker.getMatrix());
                     Log.d("onTouchEvent", "平移手势");
                 } else {
@@ -169,14 +163,14 @@ public class StickerView extends ImageView {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN: // 多点触控
-                mode = ZOOM_MULTI;
+                mode = ActionMode.ZOOM_MULTI;
                 oldDistance = sticker.getMultiTouchDistance(event);
                 midPoint = sticker.getMidPoint(event);
                 downMatrix.set(sticker.getMatrix());
                 break;
             case MotionEvent.ACTION_MOVE:
                 // 单点旋转
-                if (mode == ROTATE) {
+                if (mode == ActionMode.ROTATE) {
                     moveMatrix.set(downMatrix);
                     float deltaRotation = sticker.getSpaceRotation(event, imageMidPoint) - oldRotation;
                     moveMatrix.postRotate(deltaRotation, imageMidPoint.x, imageMidPoint.y);
@@ -184,7 +178,7 @@ public class StickerView extends ImageView {
                     invalidate();
                 }
                 // 单点缩放
-                else if (mode == ZOOM_SINGLE) {
+                else if (mode == ActionMode.ZOOM_SINGLE) {
                     moveMatrix.set(downMatrix);
                     float scale = sticker.getSingleTouchDistance(event, imageMidPoint) / oldDistance;
                     moveMatrix.postScale(scale, scale, imageMidPoint.x, imageMidPoint.y);
@@ -192,7 +186,7 @@ public class StickerView extends ImageView {
                     invalidate();
                 }
                 // 多点缩放
-                else if (mode == ZOOM_MULTI) {
+                else if (mode == ActionMode.ZOOM_MULTI) {
                     moveMatrix.set(downMatrix);
                     float scale = sticker.getMultiTouchDistance(event) / oldDistance;
                     moveMatrix.postScale(scale, scale, midPoint.x, midPoint.y);
@@ -200,7 +194,7 @@ public class StickerView extends ImageView {
                     invalidate();
                 }
                 // 平移
-                else if (mode == TRANS) {
+                else if (mode == ActionMode.TRANS) {
                     moveMatrix.set(downMatrix);
                     moveMatrix.postTranslate(event.getX() - downX, event.getY() - downY);
                     sticker.getMatrix().set(moveMatrix);
@@ -209,7 +203,7 @@ public class StickerView extends ImageView {
                 break;
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
-                mode = NONE;
+                mode = ActionMode.NONE;
                 midPoint = null;
                 imageMidPoint = null;
                 break;
@@ -268,32 +262,25 @@ public class StickerView extends ImageView {
         postInvalidate();
     }
 
+    /**
+     * 设置旋转操作的图片
+     * @param rotateRes
+     */
     public void setRotateRes(int rotateRes) {
-        this.rotateRes = rotateRes;
         rotateIcon.setSrcIcon(rotateRes);
     }
-
+    /**
+     * 设置缩放操作的图片
+     * @param zoomRes
+     */
     public void setZoomRes(int zoomRes) {
-        this.zoomRes = zoomRes;
         zoomIcon.setSrcIcon(zoomRes);
     }
-
+    /**
+     * 设置删除操作的图片
+     * @param removeRes
+     */
     public void setRemoveRes(int removeRes) {
-        this.removeRes = removeRes;
         removeIcon.setSrcIcon(removeRes);
-    }
-
-    private OnStickerActionListener listener;
-
-    public void setOnStickerActionListener(OnStickerActionListener listener) {
-        this.listener = listener;
-    }
-
-    public interface OnStickerActionListener {
-        /*删除贴纸*/
-        void onDelete();
-
-        /*编辑贴纸*/
-        void onEdit(StickerView stickerView);
     }
 }
