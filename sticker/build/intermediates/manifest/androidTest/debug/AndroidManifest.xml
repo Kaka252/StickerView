@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="techwolf.zhouyou.lib.test" >
+    package="com.zhouyou.sticker.test" >
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="24" />
+        android:targetSdkVersion="25" />
 
     <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
+        android:name="android.support.test.runner.AndroidJUnitRunner"
         android:functionalTest="false"
         android:handleProfiling="false"
-        android:label="Tests for techwolf.zhouyou.lib.test"
-        android:targetPackage="techwolf.zhouyou.lib.test" />
+        android:label="Tests for com.zhouyou.sticker.test"
+        android:targetPackage="com.zhouyou.sticker.test" />
 
     <application
         android:allowBackup="true"

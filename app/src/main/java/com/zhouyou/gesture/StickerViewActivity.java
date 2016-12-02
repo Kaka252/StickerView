@@ -9,8 +9,9 @@ import android.os.Message;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zhouyou.gesture.sticker.StickerLayout;
-import com.zhouyou.gesture.sticker.StickerUtils;
+import com.zhouyou.sticker.StickerLayout;
+import com.zhouyou.sticker.utils.BitmapUtils;
+import com.zhouyou.sticker.utils.FileUtils;
 
 import java.io.File;
 
@@ -32,6 +33,9 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
         setContentView(R.layout.activity_sticker_view);
         stickerLayout = (StickerLayout) findViewById(R.id.sticker_layout);
         stickerLayout.setBackgroundImage(R.mipmap.bg_scene);
+        stickerLayout.setZoomRes(R.mipmap.ic_resize);
+        stickerLayout.setRemoveRes(R.mipmap.ic_remove);
+        stickerLayout.setRotateRes(R.mipmap.ic_rotate);
         findViewById(R.id.tv_add_sticker).setOnClickListener(this);
         findViewById(R.id.tv_generate_preview).setOnClickListener(this);
         findViewById(R.id.tv_get_preview).setOnClickListener(this);
@@ -75,13 +79,13 @@ public class StickerViewActivity extends Activity implements View.OnClickListene
                 handler.sendEmptyMessage(0);
                 return;
             }
-            File successFile = StickerUtils.getCacheFile();
-            if (StickerUtils.saveBitmap(dstBitmap, successFile) && successFile != null && successFile.exists()) {
+            File successFile = FileUtils.getCacheFile();
+            if (BitmapUtils.saveBitmap(dstBitmap, successFile) && successFile != null && successFile.exists()) {
                 handler.obtainMessage(1, successFile.toString()).sendToTarget();
             } else {
                 handler.sendEmptyMessage(0);
             }
-            StickerUtils.recycle(dstBitmap);
+            BitmapUtils.recycle(dstBitmap);
         }
     }
 

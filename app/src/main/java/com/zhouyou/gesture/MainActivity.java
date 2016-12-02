@@ -11,8 +11,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.btn_gesture).setOnClickListener(this);
-        findViewById(R.id.btn_touch_free).setOnClickListener(this);
         findViewById(R.id.btn_sticker_view).setOnClickListener(this);
     }
 
@@ -20,14 +18,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         Intent intent;
         switch (v.getId()) {
-            case R.id.btn_gesture:
-                intent = new Intent(this, GestureZoomActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.btn_touch_free:
-                intent = new Intent(this, FreeTouchActivity.class);
-                startActivity(intent);
-                break;
             case R.id.btn_sticker_view:
                 intent = new Intent(this, StickerViewActivity.class);
                 startActivity(intent);

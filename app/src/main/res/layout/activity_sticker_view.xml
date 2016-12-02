@@ -53,7 +53,7 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <com.zhouyou.gesture.sticker.StickerLayout
+    <com.zhouyou.sticker.StickerLayout
         android:id="@+id/sticker_layout"
         android:layout_width="match_parent"
         android:layout_height="0dip"

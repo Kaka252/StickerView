@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GestureDetectorDemo.iml" filepath="$PROJECT_DIR$/GestureDetectorDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sticker/sticker.iml" filepath="$PROJECT_DIR$/sticker/sticker.iml" />
     </modules>
   </component>
 </project>

@@ -19,12 +19,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GestureZoomActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".FreeTouchActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".StickerViewActivity"
             android:screenOrientation="portrait" />
         <activity
