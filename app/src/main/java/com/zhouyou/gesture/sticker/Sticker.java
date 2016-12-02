@@ -17,7 +17,7 @@ public class Sticker {
     // 原图片
     private Bitmap srcImage;
 
-    public Sticker(Bitmap bitmap) {
+    Sticker(Bitmap bitmap) {
         this.srcImage = bitmap;
         matrix = new Matrix();
     }
@@ -27,7 +27,7 @@ public class Sticker {
      *
      * @param canvas
      */
-    public void draw(Canvas canvas) {
+    void draw(Canvas canvas) {
         canvas.drawBitmap(srcImage, matrix, null);
     }
 
@@ -36,7 +36,7 @@ public class Sticker {
      *
      * @param event
      */
-    public PointF getMidPoint(MotionEvent event) {
+    PointF getMidPoint(MotionEvent event) {
         PointF point = new PointF();
         float x = event.getX(0) + event.getX(1);
         float y = event.getY(0) + event.getY(1);
@@ -47,7 +47,7 @@ public class Sticker {
     /**
      * 获取图片中心点
      */
-    public PointF getImageMidPoint(Matrix matrix) {
+    PointF getImageMidPoint(Matrix matrix) {
         PointF point = new PointF();
         float[] points = StickerUtils.getBitmapPoints(srcImage, matrix);
         float x1 = points[0];
@@ -64,7 +64,7 @@ public class Sticker {
      * @param event
      * @return
      */
-    public float getSpaceRotation(MotionEvent event, PointF imageMidPoint) {
+    float getSpaceRotation(MotionEvent event, PointF imageMidPoint) {
         double deltaX = event.getX(0) - imageMidPoint.x;
         double deltaY = event.getY(0) - imageMidPoint.y;
         double radians = Math.atan2(deltaY, deltaX);
@@ -77,7 +77,7 @@ public class Sticker {
      * @param event
      * @return
      */
-    public float getMultiTouchDistance(MotionEvent event) {
+    float getMultiTouchDistance(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
@@ -89,31 +89,31 @@ public class Sticker {
      * @param event
      * @return
      */
-    public float getSingleTouchDistance(MotionEvent event, PointF imageMidPoint) {
+    float getSingleTouchDistance(MotionEvent event, PointF imageMidPoint) {
         float x = event.getX(0) - imageMidPoint.x;
         float y = event.getY(0) - imageMidPoint.y;
         return (float) Math.sqrt(x * x + y * y);
     }
 
-    public RectF getSrcImageBound() {
+    RectF getSrcImageBound() {
         RectF dst = new RectF();
         matrix.mapRect(dst, new RectF(0, 0, getStickerWidth(), getStickerHeight()));
         return dst;
     }
 
-    public int getStickerWidth() {
+    int getStickerWidth() {
         return srcImage == null ? 0 : srcImage.getWidth();
     }
 
-    public int getStickerHeight() {
+    int getStickerHeight() {
         return srcImage == null ? 0 : srcImage.getHeight();
     }
 
-    public Matrix getMatrix() {
+    Matrix getMatrix() {
         return matrix;
     }
 
-    public Bitmap getSrcImage() {
+    Bitmap getSrcImage() {
         return srcImage;
     }
 }
